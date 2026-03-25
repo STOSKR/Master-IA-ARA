@@ -6,3 +6,5 @@ __pycache__/
 .venv/
 uv.lock
 .dumps/
+*.egg-info/
+uv.lock
