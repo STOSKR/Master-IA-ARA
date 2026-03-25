@@ -1,9 +1,9 @@
 """Utilities to persist anomalous responses for debugging."""
 
-from datetime import UTC, datetime
 from pathlib import Path
 
 from cs2_trend.core.pathing import sanitize_component
+from cs2_trend.core.time import format_utc_filename_timestamp, utc_now
 
 
 def dump_anomalous_response(
@@ -21,7 +21,7 @@ def dump_anomalous_response(
     still fail and the original response body must be kept for diagnostics.
     """
 
-    timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = format_utc_filename_timestamp(utc_now())
     source_part = sanitize_component(source)
     endpoint_part = sanitize_component(endpoint)
     status_part = str(status_code) if status_code is not None else "na"

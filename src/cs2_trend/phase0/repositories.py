@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import csv
 import json
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
 from cs2_trend.core.pathing import sanitize_component
+from cs2_trend.core.time import format_utc_filename_timestamp, utc_now
 from cs2_trend.domain.models import CanonicalItem
 from cs2_trend.phase0.interfaces import CatalogStore, ProbeDumpStore
 from cs2_trend.phase0.models import (
@@ -17,6 +17,14 @@ from cs2_trend.phase0.models import (
     JsonValue,
     ProbeRecord,
 )
+
+
+def _dump_json_pretty(payload: JsonValue) -> str:
+    return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def _dump_json_compact(payload: JsonValue) -> str:
+    return json.dumps(payload, ensure_ascii=False)
 
 
 class FileProbeDumpRepository(ProbeDumpStore):
@@ -34,8 +42,8 @@ class FileProbeDumpRepository(ProbeDumpStore):
         status_code: int,
         payload: JsonValue,
     ) -> ProbeRecord:
-        captured_at_utc = datetime.now(tz=UTC)
-        timestamp = captured_at_utc.strftime("%Y%m%dT%H%M%SZ")
+        captured_at_utc = utc_now()
+        timestamp = format_utc_filename_timestamp(captured_at_utc)
         source_part = sanitize_component(source)
         endpoint_part = sanitize_component(endpoint)
         file_name = f"{timestamp}_{run_id}_{source_part}_{endpoint_part}_{status_code}.json"
@@ -49,7 +57,7 @@ class FileProbeDumpRepository(ProbeDumpStore):
             "status_code": status_code,
             "payload": payload,
         }
-        serialized = json.dumps(raw_payload, ensure_ascii=False, indent=2)
+        serialized = _dump_json_pretty(cast(JsonValue, raw_payload))
         dump_path.write_text(serialized, encoding="utf-8")
 
         return ProbeRecord(
@@ -113,7 +121,7 @@ class FileCatalogRepository(CatalogStore):
         if output_format in {"json", "both"}:
             json_path = self._base_dir / f"{sanitized_name}.json"
             rows = [record.model_dump(mode="json") for record in records]
-            json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+            json_path.write_text(_dump_json_pretty(cast(JsonValue, rows)), encoding="utf-8")
 
         if output_format in {"csv", "both"}:
             csv_path = self._base_dir / f"{sanitized_name}.csv"
@@ -131,8 +139,8 @@ class FileCatalogRepository(CatalogStore):
                             "is_souvenir": record.is_souvenir,
                             "rarity": record.rarity,
                             "collection": record.collection,
-                            "source_keys": json.dumps(record.source_keys, ensure_ascii=False),
-                            "metadata": json.dumps(record.metadata, ensure_ascii=False),
+                            "source_keys": _dump_json_compact(cast(JsonValue, record.source_keys)),
+                            "metadata": _dump_json_compact(cast(JsonValue, record.metadata)),
                         }
                     )
 

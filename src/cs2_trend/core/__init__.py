@@ -7,6 +7,7 @@ from cs2_trend.core.pathing import sanitize_component
 from cs2_trend.core.retry import RetryPolicy, run_with_retry
 from cs2_trend.core.run_context import RunContext
 from cs2_trend.core.seed import SeedReport, set_global_seed
+from cs2_trend.core.time import format_utc_filename_timestamp, utc_now
 
 __all__ = [
     "AppConfig",
@@ -16,9 +17,11 @@ __all__ = [
     "configure_logging",
     "dump_anomalous_response",
     "ensure_runtime_directories",
+    "format_utc_filename_timestamp",
     "get_logger",
     "load_config",
     "run_with_retry",
     "sanitize_component",
     "set_global_seed",
+    "utc_now",
 ]
