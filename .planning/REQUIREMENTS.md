@@ -77,33 +77,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CTX-01 | TBD | Pending |
-| CTX-02 | TBD | Pending |
-| CTX-03 | TBD | Pending |
-| CAT-01 | TBD | Pending |
-| CAT-02 | TBD | Pending |
-| CAT-03 | TBD | Pending |
-| EXT-01 | TBD | Pending |
-| EXT-02 | TBD | Pending |
-| EXT-03 | TBD | Pending |
-| EXT-04 | TBD | Pending |
-| EXT-05 | TBD | Pending |
-| EXT-06 | TBD | Pending |
-| REL-01 | TBD | Pending |
-| REL-02 | TBD | Pending |
-| REL-03 | TBD | Pending |
-| QLT-01 | TBD | Pending |
-| QLT-02 | TBD | Pending |
-| QLT-03 | TBD | Pending |
-| QAG-01 | TBD | Pending |
-| QAG-02 | TBD | Pending |
-| QAG-03 | TBD | Pending |
-| QAG-04 | TBD | Pending |
+| CTX-01 | Phase 0 | Pending |
+| CTX-02 | Phase 0 | Pending |
+| CTX-03 | Phase 0 | Pending |
+| CAT-01 | Phase 0 | Pending |
+| CAT-02 | Phase 0 | Pending |
+| CAT-03 | Phase 0 | Pending |
+| EXT-01 | Phase 1 | Pending |
+| EXT-02 | Phase 1 | Pending |
+| EXT-03 | Phase 1 | Pending |
+| EXT-04 | Phase 1 | Pending |
+| EXT-05 | Phase 1 | Pending |
+| EXT-06 | Phase 1 | Pending |
+| REL-01 | Phase 1 | Pending |
+| REL-02 | Phase 1 | Pending |
+| REL-03 | Phase 1 | Pending |
+| QLT-01 | Phase 1 | Pending |
+| QLT-02 | Phase 1 | Pending |
+| QLT-03 | Phase 1 | Pending |
+| QAG-01 | Phase 0 | Pending |
+| QAG-02 | Phase 0 | Pending |
+| QAG-03 | Phase 1 | Pending |
+| QAG-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-25*
