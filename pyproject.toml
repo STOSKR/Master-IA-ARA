@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cs2-price-trend"
+version = "0.1.0"
+description = "Foundational scaffold for CS2 price trend intelligence."
+readme = "claude.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.12,<3",
+  "pydantic-settings>=2.13,<3",
+  "typer>=0.12,<1",
+]
+
+[project.scripts]
+cs2trend = "cs2_trend.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cs2_trend"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+mypy_path = "src"
+packages = ["cs2_trend"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
