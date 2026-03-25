@@ -1,9 +1,21 @@
+.venv/
+
+# Python cache/bytecode
 __pycache__/
 *.py[cod]
-.pytest_cache/
+
+# Tool caches
 .mypy_cache/
+.pytest_cache/
 .ruff_cache/
-.venv/
-.dumps/
+
+# Build artifacts
 *.egg-info/
+
+# Local runtime/test artifacts
+.coverage
+htmlcov/
+dumps/
+.dumps/
+tmp/
 uv.lock
