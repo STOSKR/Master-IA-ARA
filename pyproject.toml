@@ -9,16 +9,26 @@ description = "Foundational scaffold for CS2 price trend intelligence."
 readme = "claude.md"
 requires-python = ">=3.12"
 dependencies = [
+  "httpx>=0.28,<0.29",
+  "pandas>=2.2,<3",
+  "pandera>=0.20,<1",
   "pydantic>=2.12,<3",
   "pydantic-settings>=2.13,<3",
   "typer>=0.12,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.11,<2",
+  "pytest>=8.3,<9",
+  "ruff>=0.6,<1",
 ]
 
 [project.scripts]
 cs2trend = "cs2_trend.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/cs2_trend"]
+packages = ["src/cs2_trend", "src/extraction"]
 
 [tool.ruff]
 target-version = "py312"
@@ -26,15 +36,17 @@ line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "N", "RUF"]
+select = ["E", "F", "I", "B", "UP", "N", "RUF", "ASYNC"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
 warn_unused_configs = true
 mypy_path = "src"
-packages = ["cs2_trend"]
+files = ["src", "tests"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "-q"
+pythonpath = ["src"]
 testpaths = ["tests"]
