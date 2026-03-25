@@ -4,9 +4,6 @@ import asyncio
 import random
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import TypeVar
-
-T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -40,7 +37,7 @@ def compute_backoff_delay(
     return bounded_delay + jitter
 
 
-async def run_with_retry(
+async def run_with_retry[T](
     operation: Callable[[], Awaitable[T]],
     policy: RetryPolicy,
     on_retry: Callable[[int, Exception, float], None] | None = None,
@@ -64,7 +61,7 @@ async def run_with_retry(
     for attempt in range(1, policy.max_attempts + 1):
         try:
             return await operation()
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             last_error = exc
             if attempt >= policy.max_attempts:
                 break

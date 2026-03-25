@@ -14,6 +14,10 @@ class AppConfig(BaseSettings):
     log_level: str = "INFO"
     data_dir: Path = Field(default=Path("data"))
     dump_dir: Path = Field(default=Path("data/dumps"))
+    probe_dump_dir: Path = Field(default=Path("data/dumps/probes"))
+    catalog_dir: Path = Field(default=Path("data/catalog"))
+    csfloat_probe_endpoint: str = "https://csfloat.com/api/v1/listings"
+    http_timeout_seconds: float = 15.0
     random_seed: int = 42
 
     model_config = SettingsConfigDict(
@@ -34,3 +38,5 @@ def ensure_runtime_directories(config: AppConfig) -> None:
 
     config.data_dir.mkdir(parents=True, exist_ok=True)
     config.dump_dir.mkdir(parents=True, exist_ok=True)
+    config.probe_dump_dir.mkdir(parents=True, exist_ok=True)
+    config.catalog_dir.mkdir(parents=True, exist_ok=True)

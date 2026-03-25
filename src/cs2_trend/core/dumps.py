@@ -3,12 +3,7 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-
-def _sanitize_component(raw: str) -> str:
-    """Return a filesystem-safe slug-like component."""
-
-    cleaned = "".join(char if char.isalnum() else "_" for char in raw.strip().lower())
-    return cleaned.strip("_") or "unknown"
+from cs2_trend.core.pathing import sanitize_component
 
 
 def dump_anomalous_response(
@@ -27,8 +22,8 @@ def dump_anomalous_response(
     """
 
     timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
-    source_part = _sanitize_component(source)
-    endpoint_part = _sanitize_component(endpoint)
+    source_part = sanitize_component(source)
+    endpoint_part = sanitize_component(endpoint)
     status_part = str(status_code) if status_code is not None else "na"
 
     base_dir.mkdir(parents=True, exist_ok=True)

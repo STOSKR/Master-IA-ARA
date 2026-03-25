@@ -26,7 +26,7 @@ def set_global_seed(seed: int) -> SeedReport:
 
     numpy_seeded = False
     try:
-        import numpy as np
+        import numpy as np  # type: ignore[import-not-found]
 
         np.random.seed(seed)
         numpy_seeded = True
