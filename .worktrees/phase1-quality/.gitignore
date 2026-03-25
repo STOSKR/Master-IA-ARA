@@ -1,0 +1,16 @@
+.venv/*
+
+# Python cache/bytecode
+__pycache__/
+*.py[cod]
+
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Local runtime/test artifacts
+.coverage
+htmlcov/
+dumps/
+tmp/
