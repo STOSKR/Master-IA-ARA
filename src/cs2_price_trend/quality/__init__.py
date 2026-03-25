@@ -15,20 +15,22 @@ from .sanitation import (
     find_duplicate_rows,
     sanitize_price_outliers_iqr,
 )
+from .transforms import extraction_results_to_history_frame
 from .validation import HISTORY_SCHEMA, validate_history_dataframe
 
 __all__ = [
+    "ALLOWED_SOURCES",
+    "CURRENCY_CODE_REGEX",
     "HISTORY_ALL_FIELDS",
     "HISTORY_MANDATORY_FIELDS",
     "HISTORY_OPTIONAL_FIELDS",
-    "ALLOWED_SOURCES",
-    "CURRENCY_CODE_REGEX",
-    "PRICE_BASIS_ALLOWED",
-    "normalize_source",
     "HISTORY_SCHEMA",
-    "validate_history_dataframe",
-    "find_duplicate_rows",
-    "drop_duplicate_rows",
+    "PRICE_BASIS_ALLOWED",
     "detect_price_outliers_iqr",
+    "drop_duplicate_rows",
+    "extraction_results_to_history_frame",
+    "find_duplicate_rows",
+    "normalize_source",
     "sanitize_price_outliers_iqr",
+    "validate_history_dataframe",
 ]

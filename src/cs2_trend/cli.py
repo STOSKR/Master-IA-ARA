@@ -14,7 +14,12 @@ from cs2_trend.core.run_context import RunContext
 from cs2_trend.core.seed import set_global_seed
 from cs2_trend.phase0.http_clients import UrllibJsonHttpClient
 from cs2_trend.phase0.repositories import FileCatalogRepository, FileProbeDumpRepository
-from cs2_trend.phase0.services import CatalogService, CsfloatCatalogParser, CsfloatProbeService
+from cs2_trend.phase0.services import (
+    CatalogService,
+    CsfloatCatalogParser,
+    CsfloatProbeService,
+)
+from cs2_trend.phase1.services import execute_phase1_extraction
 
 app = typer.Typer(help="CS2 Trend CLI", no_args_is_help=True, add_completion=False)
 phase0_app = typer.Typer(help="Phase 0 foundation and catalog discovery commands")
@@ -66,7 +71,9 @@ def _get_state(ctx: typer.Context) -> tuple[AppConfig, RunContext]:
 @phase0_app.command("probe")
 def phase0_probe(
     ctx: typer.Context,
-    source: Annotated[str, typer.Argument(..., help="Source to probe (example: csfloat).")],
+    source: Annotated[
+        str, typer.Argument(..., help="Source to probe (example: csfloat).")
+    ],
     sample_size: Annotated[int, typer.Option("--sample-size", "-n", min=1)] = 1,
     endpoint: Annotated[
         str | None,
@@ -155,7 +162,9 @@ def phase0_catalog(
     if selected_dump_file is None:
         selected_dump_file = catalog_service.latest_probe_path(source="csfloat")
     if selected_dump_file is None:
-        raise typer.BadParameter("No probe dump found. Run `cs2trend phase0 probe csfloat` first.")
+        raise typer.BadParameter(
+            "No probe dump found. Run `cs2trend phase0 probe csfloat` first."
+        )
 
     records = catalog_service.build_catalog_from_dump(dump_path=selected_dump_file)
     result = catalog_service.persist_catalog(
@@ -192,24 +201,57 @@ def phase1_extract(
         typer.Option("--source", "-s", help="Source filters."),
     ] = None,
     limit_items: Annotated[int, typer.Option("--limit-items", min=1)] = 50,
+    catalog_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--catalog-file",
+            "-c",
+            help="Catalog JSON/CSV path. Defaults to latest JSON in data/catalog/.",
+        ),
+    ] = None,
 ) -> None:
-    """Placeholder command for asynchronous historical extraction."""
+    """Run asynchronous historical extraction with quality gates and persisted outputs."""
 
-    config, run_context = _get_state(ctx)
-    selected_sources = source if source else ["steam", "steamdt", "buff163", "csmoney", "csfloat"]
+    config, _ = _get_state(ctx)
+    selected_sources = (
+        source if source else ["steam", "steamdt", "buff163", "csmoney", "csfloat"]
+    )
+
+    try:
+        result = asyncio.run(
+            execute_phase1_extraction(
+                config=config,
+                selected_sources=selected_sources,
+                limit_items=limit_items,
+                catalog_path=catalog_file,
+            )
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
     logger = get_logger(__name__)
     logger.info(
-        "phase1 extract placeholder invoked",
+        "phase1 extract completed",
         extra={
-            "run_id": run_context.run_id,
+            "run_id": result.run_id,
             "selected_sources": ",".join(selected_sources),
             "limit_items": limit_items,
+            "total_jobs": result.total_jobs,
+            "success_count": result.success_count,
+            "failure_count": result.failure_count,
         },
     )
+
     typer.echo(
-        f"[placeholder] phase1 extract sources={selected_sources} limit_items={limit_items} "
-        f"dump_dir={config.dump_dir}"
+        "Phase1 extraction completed: "
+        f"run_id={result.run_id} jobs={result.total_jobs} "
+        f"success={result.success_count} failure={result.failure_count}"
     )
+    typer.echo(f"- metrics: {result.metrics_path}")
+    for output in result.raw_paths:
+        typer.echo(f"- raw: {output}")
+    for output in result.curated_paths:
+        typer.echo(f"- curated: {output}")
 
 
 def main() -> None:

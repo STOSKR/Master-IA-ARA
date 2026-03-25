@@ -13,11 +13,11 @@ from .paths import (
 
 __all__ = [
     "StorageRoots",
+    "curated_partition_dir",
+    "curated_run_partition_dir",
+    "dumps_partition_dir",
+    "dumps_run_partition_dir",
     "ensure_directory",
     "raw_partition_dir",
-    "curated_partition_dir",
-    "dumps_partition_dir",
     "raw_run_partition_dir",
-    "curated_run_partition_dir",
-    "dumps_run_partition_dir",
 ]
