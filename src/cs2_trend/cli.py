@@ -1,6 +1,7 @@
 """Command line interface for CS2 trend project phases."""
 
 import asyncio
+import os
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
@@ -19,7 +20,6 @@ from cs2_trend.phase0.services import (
     CsfloatCatalogParser,
     CsfloatProbeService,
 )
-from cs2_trend.phase1.services import execute_phase1_extraction
 
 app = typer.Typer(help="CS2 Trend CLI", no_args_is_help=True, add_completion=False)
 phase0_app = typer.Typer(help="Phase 0 foundation and catalog discovery commands")
@@ -88,12 +88,24 @@ def phase0_probe(
         raise typer.BadParameter("Only csfloat source is implemented in phase0.")
 
     resolved_endpoint = endpoint or config.csfloat_probe_endpoint
+    probe_headers: dict[str, str] = {}
+    api_key = os.getenv("CSFLOAT_API_KEY")
+    cookie = os.getenv("CSFLOAT_COOKIE")
+    custom_user_agent = os.getenv("CSFLOAT_USER_AGENT")
+    if api_key:
+        probe_headers["Authorization"] = api_key
+    if cookie:
+        probe_headers["Cookie"] = cookie
+    if custom_user_agent:
+        probe_headers["User-Agent"] = custom_user_agent
+
     dump_store = FileProbeDumpRepository(base_dir=config.probe_dump_dir)
     probe_service = CsfloatProbeService(
         http_client=UrllibJsonHttpClient(timeout_seconds=config.http_timeout_seconds),
         dump_store=dump_store,
         fallback_dump_dir=config.dump_dir,
         retry_policy=RetryPolicy(),
+        request_headers=probe_headers,
     )
 
     records = asyncio.run(
@@ -211,6 +223,8 @@ def phase1_extract(
     ] = None,
 ) -> None:
     """Run asynchronous historical extraction with quality gates and persisted outputs."""
+
+    from cs2_trend.phase1.services import execute_phase1_extraction
 
     config, _ = _get_state(ctx)
     selected_sources = (

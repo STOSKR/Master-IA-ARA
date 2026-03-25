@@ -46,6 +46,8 @@ _SOURCE_TO_ENV: dict[str, str] = {
     "csfloat": "CSFLOAT_PROBE_ENDPOINT",
 }
 
+_CSFLOAT_AUTH_ENV_NAMES: tuple[str, ...] = ("CSFLOAT_API_KEY", "CSFLOAT_COOKIE")
+
 
 class ConnectorFactory(Protocol):
     """Build connector instances for selected sources."""
@@ -310,42 +312,34 @@ def _build_default_connectors(
     selected_sources: Sequence[str],
     http_client: AsyncHttpClient,
 ) -> Sequence[MarketConnector]:
-    connectors: list[MarketConnector] = []
+    connector_builders: dict[str, MarketConnector] = {
+        "steam": SteamConnector(
+            http_client=http_client,
+            endpoint=config.steam_probe_endpoint,
+        ),
+        "steamdt": SteamdtConnector(
+            http_client=http_client,
+            endpoint=config.steamdt_probe_endpoint,
+        ),
+        "buff163": Buff163Connector(
+            http_client=http_client,
+            endpoint=config.buff163_probe_endpoint,
+        ),
+        "csmoney": CSMoneyConnector(
+            http_client=http_client,
+            endpoint=config.csmoney_probe_endpoint,
+        ),
+        "csfloat": CSFloatConnector(
+            http_client=http_client,
+            endpoint=config.csfloat_history_endpoint or config.csfloat_probe_endpoint,
+        ),
+    }
 
-    for source in selected_sources:
-        if source == "steam":
-            connectors.append(
-                SteamConnector(
-                    http_client=http_client,
-                    endpoint=config.steam_probe_endpoint,
-                )
-            )
-        elif source == "steamdt":
-            connectors.append(
-                SteamdtConnector(
-                    http_client=http_client,
-                    endpoint=config.steamdt_probe_endpoint,
-                )
-            )
-        elif source == "buff163":
-            connectors.append(
-                Buff163Connector(
-                    http_client=http_client,
-                    endpoint=config.buff163_probe_endpoint,
-                )
-            )
-        elif source == "csmoney":
-            connectors.append(
-                CSMoneyConnector(
-                    http_client=http_client,
-                    endpoint=config.csmoney_probe_endpoint,
-                )
-            )
-        elif source == "csfloat":
-            endpoint = config.csfloat_history_endpoint or config.csfloat_probe_endpoint
-            connectors.append(
-                CSFloatConnector(http_client=http_client, endpoint=endpoint)
-            )
+    connectors = [
+        connector_builders[source]
+        for source in selected_sources
+        if source in connector_builders
+    ]
 
     return tuple(connectors)
 
@@ -363,12 +357,23 @@ def _ensure_sources_are_configured(
         if endpoint is None and (env_value is None or not env_value.strip()):
             missing.append(f"{source} ({env_name})")
 
+        if source == "csfloat" and not _has_csfloat_auth():
+            missing.append("csfloat authentication (CSFLOAT_API_KEY or CSFLOAT_COOKIE)")
+
     if missing:
         joined = ", ".join(sorted(missing))
         raise ValueError(
             "Missing endpoint configuration for selected sources: "
             f"{joined}. Set environment variables or AppConfig endpoint fields."
         )
+
+
+def _has_csfloat_auth() -> bool:
+    for env_name in _CSFLOAT_AUTH_ENV_NAMES:
+        value = os.getenv(env_name)
+        if value and value.strip():
+            return True
+    return False
 
 
 def _endpoint_for_source(*, config: AppConfig, source: str) -> str | None:
@@ -417,26 +422,18 @@ def _write_frame_by_source(
         "historical_prices_curated.csv" if curated else "historical_prices_raw.csv"
     )
     date_partition = timestamp.date()
+    partition_resolver = curated_run_partition_dir if curated else raw_run_partition_dir
 
     written_paths: list[Path] = []
     for source, source_frame in frame.groupby("source", sort=True):
         normalized_source = normalize_source(str(source))
-        if curated:
-            directory = curated_run_partition_dir(
-                roots,
-                date_partition,
-                normalized_source,
-                run_id,
-                create=True,
-            )
-        else:
-            directory = raw_run_partition_dir(
-                roots,
-                date_partition,
-                normalized_source,
-                run_id,
-                create=True,
-            )
+        directory = partition_resolver(
+            roots,
+            date_partition,
+            normalized_source,
+            run_id,
+            create=True,
+        )
 
         output_path = directory / file_name
         source_frame.to_csv(output_path, index=False)

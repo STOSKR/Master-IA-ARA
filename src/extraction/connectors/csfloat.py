@@ -54,7 +54,16 @@ class CSFloatConnector(ProbeFirstConnector):
         }
 
     def build_headers(self, _target: ExtractionTarget) -> Mapping[str, str]:
+        headers: dict[str, str] = {}
         api_key = os.getenv("CSFLOAT_API_KEY")
-        if not api_key:
-            return {}
-        return {"Authorization": api_key}
+        cookie = os.getenv("CSFLOAT_COOKIE")
+        user_agent = os.getenv("CSFLOAT_USER_AGENT")
+
+        if api_key:
+            headers["Authorization"] = api_key
+        if cookie:
+            headers["Cookie"] = cookie
+        if user_agent:
+            headers["User-Agent"] = user_agent
+
+        return headers

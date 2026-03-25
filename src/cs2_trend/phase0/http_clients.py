@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from collections.abc import Mapping
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -13,17 +14,38 @@ from cs2_trend.phase0.models import HttpJsonResponse, JsonValue
 class UrllibJsonHttpClient:
     """Async wrapper around urllib for JSON endpoint probing."""
 
-    def __init__(self, *, timeout_seconds: float, user_agent: str = "cs2-trend/0.1") -> None:
+    def __init__(
+        self,
+        *,
+        timeout_seconds: float,
+        user_agent: str = "cs2-trend/0.1",
+        default_headers: Mapping[str, str] | None = None,
+    ) -> None:
         self._timeout_seconds = timeout_seconds
         self._user_agent = user_agent
+        self._default_headers = dict(default_headers or {})
 
-    async def fetch_json(self, *, endpoint: str) -> HttpJsonResponse:
+    async def fetch_json(
+        self,
+        *,
+        endpoint: str,
+        headers: Mapping[str, str] | None = None,
+    ) -> HttpJsonResponse:
         """Fetch endpoint and decode JSON payload in a worker thread."""
 
-        return await asyncio.to_thread(self._fetch_json_sync, endpoint)
+        return await asyncio.to_thread(self._fetch_json_sync, endpoint, headers)
 
-    def _fetch_json_sync(self, endpoint: str) -> HttpJsonResponse:
-        request = Request(endpoint, headers={"User-Agent": self._user_agent})
+    def _fetch_json_sync(
+        self,
+        endpoint: str,
+        headers: Mapping[str, str] | None,
+    ) -> HttpJsonResponse:
+        resolved_headers = {
+            "User-Agent": self._user_agent,
+            **self._default_headers,
+            **dict(headers or {}),
+        }
+        request = Request(endpoint, headers=resolved_headers)
         try:
             with urlopen(request, timeout=self._timeout_seconds) as response:
                 status_code = int(response.status)

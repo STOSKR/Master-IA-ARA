@@ -122,3 +122,48 @@ def test_csfloat_connector_unknown_shape_fails_explicitly() -> None:
         assert len(client.calls) == 1
 
     asyncio.run(scenario())
+
+
+def test_csfloat_connector_forwards_optional_auth_headers(monkeypatch) -> None:
+    async def scenario() -> None:
+        payload = {
+            "data": [
+                {
+                    "timestamp": 1704067200,
+                    "price": "10.00",
+                    "volume": "1",
+                    "currency": "usd",
+                }
+            ]
+        }
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://api.csfloat.test/history",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+
+        monkeypatch.setenv("CSFLOAT_API_KEY", "key-123")
+        monkeypatch.setenv("CSFLOAT_COOKIE", "session=abc")
+        monkeypatch.setenv("CSFLOAT_USER_AGENT", "test-agent")
+
+        connector = CSFloatConnector(
+            http_client=client,
+            endpoint="https://api.csfloat.test/history",
+        )
+        target = ExtractionTarget(item_id="13", market_hash_name="AWP | Asiimov")
+
+        await connector.extract(target)
+
+        assert len(client.calls) == 1
+        _, _, headers = client.calls[0]
+        assert headers is not None
+        assert headers["Authorization"] == "key-123"
+        assert headers["Cookie"] == "session=abc"
+        assert headers["User-Agent"] == "test-agent"
+
+    asyncio.run(scenario())

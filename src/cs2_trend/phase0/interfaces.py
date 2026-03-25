@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol
 
@@ -18,7 +19,12 @@ from cs2_trend.phase0.models import (
 class JsonHttpClient(Protocol):
     """Abstract async HTTP client returning decoded JSON payloads."""
 
-    async def fetch_json(self, *, endpoint: str) -> HttpJsonResponse:
+    async def fetch_json(
+        self,
+        *,
+        endpoint: str,
+        headers: Mapping[str, str] | None = None,
+    ) -> HttpJsonResponse:
         """Request an endpoint and decode its JSON response."""
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from cs2_trend.core.dumps import dump_anomalous_response
@@ -33,17 +34,22 @@ class CsfloatProbeService:
         dump_store: ProbeDumpStore,
         fallback_dump_dir: Path,
         retry_policy: RetryPolicy,
+        request_headers: Mapping[str, str] | None = None,
     ) -> None:
         self._http_client = http_client
         self._dump_store = dump_store
         self._fallback_dump_dir = fallback_dump_dir
         self._retry_policy = retry_policy
+        self._request_headers = dict(request_headers or {})
 
     async def capture_sample(self, *, endpoint: str, run_id: str) -> ProbeRecord:
         """Probe endpoint with retries and persist successful payload dump."""
 
         async def operation() -> HttpJsonResponse:
-            return await self._http_client.fetch_json(endpoint=endpoint)
+            return await self._http_client.fetch_json(
+                endpoint=endpoint,
+                headers=self._request_headers,
+            )
 
         try:
             response = await run_with_retry(operation, self._retry_policy)

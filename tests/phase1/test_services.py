@@ -183,6 +183,48 @@ def test_execute_phase1_extraction_requires_endpoint_configuration(
         except ValueError as exc:
             assert "Missing endpoint configuration" in str(exc)
         else:
-            raise AssertionError("Expected ValueError for missing endpoint configuration")
+            raise AssertionError(
+                "Expected ValueError for missing endpoint configuration"
+            )
+
+    asyncio.run(scenario())
+
+
+def test_execute_phase1_extraction_requires_csfloat_auth(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    async def scenario() -> None:
+        monkeypatch.delenv("CSFLOAT_API_KEY", raising=False)
+        monkeypatch.delenv("CSFLOAT_COOKIE", raising=False)
+
+        catalog_path = tmp_path / "catalog" / "master_catalog.json"
+        catalog_path.parent.mkdir(parents=True, exist_ok=True)
+        catalog_path.write_text(
+            json.dumps([{"canonical_item_id": "ak_47__redline__field_tested"}]),
+            encoding="utf-8",
+        )
+
+        config = AppConfig(
+            data_dir=tmp_path / "data",
+            raw_dir=tmp_path / "data" / "raw",
+            curated_dir=tmp_path / "data" / "curated",
+            dump_dir=tmp_path / "data" / "dumps",
+            probe_dump_dir=tmp_path / "data" / "dumps" / "probes",
+            catalog_dir=tmp_path / "catalog",
+            csfloat_history_endpoint="https://csfloat.com/api/v1/listings",
+        )
+
+        try:
+            await execute_phase1_extraction(
+                config=config,
+                selected_sources=["csfloat"],
+                limit_items=1,
+                catalog_path=catalog_path,
+            )
+        except ValueError as exc:
+            assert "CSFLOAT_API_KEY or CSFLOAT_COOKIE" in str(exc)
+        else:
+            raise AssertionError("Expected ValueError when CSFloat auth is missing")
 
     asyncio.run(scenario())
