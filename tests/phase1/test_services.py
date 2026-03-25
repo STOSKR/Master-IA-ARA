@@ -5,10 +5,9 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
-import pytest
-from _pytest.monkeypatch import MonkeyPatch
 
 from cs2_trend.core.config import AppConfig
 from cs2_trend.phase1.services import execute_phase1_extraction
@@ -152,7 +151,7 @@ def test_execute_phase1_extraction_writes_raw_curated_and_metrics(
 
 def test_execute_phase1_extraction_requires_endpoint_configuration(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: Any,
 ) -> None:
     async def scenario() -> None:
         monkeypatch.delenv("STEAM_PROBE_ENDPOINT", raising=False)
@@ -174,12 +173,16 @@ def test_execute_phase1_extraction_requires_endpoint_configuration(
             steam_probe_endpoint=None,
         )
 
-        with pytest.raises(ValueError, match="Missing endpoint configuration"):
+        try:
             await execute_phase1_extraction(
                 config=config,
                 selected_sources=["steam"],
                 limit_items=1,
                 catalog_path=catalog_path,
             )
+        except ValueError as exc:
+            assert "Missing endpoint configuration" in str(exc)
+        else:
+            raise AssertionError("Expected ValueError for missing endpoint configuration")
 
     asyncio.run(scenario())
