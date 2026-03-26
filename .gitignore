@@ -19,3 +19,9 @@ dumps/
 .dumps/
 tmp/
 uv.lock
+
+# Local authenticated session artifacts (must never be committed)
+cookies.json
+cookies.*.json
+auth_cookies.json
+auth_cookies.*.json
