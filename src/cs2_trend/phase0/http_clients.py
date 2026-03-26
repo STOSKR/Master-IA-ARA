@@ -54,11 +54,15 @@ class UrllibJsonHttpClient:
             status_code = int(exc.code)
             body = exc.read().decode("utf-8", errors="replace")
         except URLError as exc:
-            raise RuntimeError(f"network error while probing endpoint: {endpoint}") from exc
+            raise RuntimeError(
+                f"network error while probing endpoint: {endpoint}"
+            ) from exc
 
         try:
             payload: JsonValue = json.loads(body)
         except json.JSONDecodeError as exc:
             raise ValueError(f"endpoint did not return valid JSON: {endpoint}") from exc
 
-        return HttpJsonResponse(endpoint=endpoint, status_code=status_code, payload=payload)
+        return HttpJsonResponse(
+            endpoint=endpoint, status_code=status_code, payload=payload
+        )

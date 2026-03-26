@@ -10,7 +10,12 @@ from cs2_trend.core.dumps import dump_anomalous_response
 from cs2_trend.core.retry import RetryPolicy, run_with_retry
 from cs2_trend.domain.canonical_id import build_canonical_item_id
 from cs2_trend.domain.models import CanonicalItem, MarketSource
-from cs2_trend.phase0.interfaces import CatalogParser, CatalogStore, JsonHttpClient, ProbeDumpStore
+from cs2_trend.phase0.interfaces import (
+    CatalogParser,
+    CatalogStore,
+    JsonHttpClient,
+    ProbeDumpStore,
+)
 from cs2_trend.phase0.models import (
     CatalogOutputFormat,
     CatalogPersistenceResult,
@@ -154,7 +159,9 @@ class CsfloatCatalogParser(CatalogParser):
                     update={"source_keys": merged_source_keys}
                 )
 
-        return tuple(sorted(by_canonical_id.values(), key=lambda item: item.canonical_item_id))
+        return tuple(
+            sorted(by_canonical_id.values(), key=lambda item: item.canonical_item_id)
+        )
 
     def _extract_listings(self, payload: JsonValue) -> tuple[dict[str, JsonValue], ...]:
         if isinstance(payload, list):
@@ -173,7 +180,9 @@ class CsfloatCatalogParser(CatalogParser):
 
         return ()
 
-    def _get_first_string(self, listing: dict[str, JsonValue], keys: tuple[str, ...]) -> str | None:
+    def _get_first_string(
+        self, listing: dict[str, JsonValue], keys: tuple[str, ...]
+    ) -> str | None:
         for key in keys:
             value = listing.get(key)
             if isinstance(value, str):
@@ -236,7 +245,9 @@ class CatalogService:
         self._catalog_store = catalog_store
         self._dump_store = dump_store
 
-    def build_catalog_from_payload(self, *, payload: JsonValue) -> tuple[CanonicalItem, ...]:
+    def build_catalog_from_payload(
+        self, *, payload: JsonValue
+    ) -> tuple[CanonicalItem, ...]:
         """Build canonical catalog records from a payload object."""
 
         return self._parser.parse_catalog_items(payload=payload)
