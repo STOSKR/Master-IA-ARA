@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 
+from extraction.auth_cookies import resolve_platform_cookie_header
 from extraction.connectors.base import ProbeFirstConnector
 from extraction.connectors.json_parser import JsonShapeSpec, build_json_point_parser
 from extraction.models import ExtractionTarget
@@ -56,7 +57,10 @@ class CSFloatConnector(ProbeFirstConnector):
     def build_headers(self, _target: ExtractionTarget) -> Mapping[str, str]:
         headers: dict[str, str] = {}
         api_key = os.getenv("CSFLOAT_API_KEY")
-        cookie = os.getenv("CSFLOAT_COOKIE")
+        cookie = resolve_platform_cookie_header(
+            platform=self.source_name,
+            env_cookie_var="CSFLOAT_COOKIE",
+        )
         user_agent = os.getenv("CSFLOAT_USER_AGENT")
 
         if api_key:

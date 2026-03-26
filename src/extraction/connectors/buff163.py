@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 
+from extraction.auth_cookies import resolve_platform_cookie_header
 from extraction.connectors.base import ProbeFirstConnector
 from extraction.connectors.json_parser import JsonShapeSpec, build_json_point_parser
 from extraction.models import ExtractionTarget
@@ -55,7 +56,10 @@ class Buff163Connector(ProbeFirstConnector):
 
     def build_headers(self, _target: ExtractionTarget) -> Mapping[str, str]:
         headers: dict[str, str] = {}
-        cookie = os.getenv("BUFF163_COOKIE")
+        cookie = resolve_platform_cookie_header(
+            platform=self.source_name,
+            env_cookie_var="BUFF163_COOKIE",
+        )
         user_agent = os.getenv("BUFF163_USER_AGENT")
         if cookie:
             headers["Cookie"] = cookie

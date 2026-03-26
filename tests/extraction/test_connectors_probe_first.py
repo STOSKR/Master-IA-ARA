@@ -4,6 +4,9 @@ import asyncio
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
+
+from pytest import MonkeyPatch
 
 from extraction.connectors.csfloat import CSFloatConnector
 from extraction.errors import EndpointNotConfiguredError, UnknownResponseShapeError
@@ -34,7 +37,7 @@ class FakeHttpClient:
         return None
 
 
-def test_probe_first_requires_endpoint(monkeypatch) -> None:
+def test_probe_first_requires_endpoint(monkeypatch: MonkeyPatch) -> None:
     async def scenario() -> None:
         monkeypatch.delenv("CSFLOAT_PROBE_ENDPOINT", raising=False)
         client = FakeHttpClient(responses=[])
@@ -124,7 +127,9 @@ def test_csfloat_connector_unknown_shape_fails_explicitly() -> None:
     asyncio.run(scenario())
 
 
-def test_csfloat_connector_forwards_optional_auth_headers(monkeypatch) -> None:
+def test_csfloat_connector_forwards_optional_auth_headers(
+    monkeypatch: MonkeyPatch,
+) -> None:
     async def scenario() -> None:
         payload = {
             "data": [
@@ -165,5 +170,72 @@ def test_csfloat_connector_forwards_optional_auth_headers(monkeypatch) -> None:
         assert headers["Authorization"] == "key-123"
         assert headers["Cookie"] == "session=abc"
         assert headers["User-Agent"] == "test-agent"
+
+    asyncio.run(scenario())
+
+
+def test_csfloat_connector_loads_cookie_header_from_auth_cookie_file(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    async def scenario() -> None:
+        payload = {
+            "data": [
+                {
+                    "timestamp": 1704067200,
+                    "price": "10.00",
+                    "volume": "1",
+                    "currency": "usd",
+                }
+            ]
+        }
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://api.csfloat.test/history",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+
+        cookie_store_path = tmp_path / "cookies.json"
+        cookie_store_payload = {
+            "platforms": {
+                "csfloat": {
+                    "cookies": [
+                        {
+                            "name": "session",
+                            "value": "from-file",
+                            "domain": "csfloat.com",
+                            "path": "/",
+                        }
+                    ]
+                }
+            }
+        }
+        cookie_store_path.write_text(
+            json.dumps(cookie_store_payload),
+            encoding="utf-8",
+        )
+
+        monkeypatch.setenv("AUTH_COOKIES_PATH", str(cookie_store_path))
+        monkeypatch.delenv("CSFLOAT_API_KEY", raising=False)
+        monkeypatch.delenv("CSFLOAT_COOKIE", raising=False)
+        monkeypatch.delenv("CSFLOAT_USER_AGENT", raising=False)
+
+        connector = CSFloatConnector(
+            http_client=client,
+            endpoint="https://api.csfloat.test/history",
+        )
+        target = ExtractionTarget(item_id="14", market_hash_name="AK-47 | Neon Rider")
+
+        await connector.extract(target)
+
+        assert len(client.calls) == 1
+        _, _, headers = client.calls[0]
+        assert headers is not None
+        assert headers["Cookie"] == "session=from-file"
 
     asyncio.run(scenario())
