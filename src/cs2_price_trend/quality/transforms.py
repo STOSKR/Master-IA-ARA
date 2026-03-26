@@ -16,6 +16,7 @@ def extraction_results_to_history_frame(
     results: Sequence[ExtractionRunResult],
     *,
     price_basis: str = "listing",
+    include_context_columns: bool = False,
 ) -> pd.DataFrame:
     """Convert kernel run results into the canonical historical table contract."""
 
@@ -39,11 +40,23 @@ def extraction_results_to_history_frame(
                     "availability": None,
                 }
             )
+            if include_context_columns:
+                rows[-1].update(_extract_context_fields(result))
 
     if not rows:
-        return pd.DataFrame(columns=list(HISTORY_ALL_FIELDS))
+        columns = list(HISTORY_ALL_FIELDS)
+        if include_context_columns:
+            columns.extend(["object_type", "object_subtype", "type_name"])
+        return pd.DataFrame(columns=columns)
 
-    frame = pd.DataFrame(rows, columns=list(HISTORY_ALL_FIELDS))
+    frame = pd.DataFrame(rows)
+    ordered_columns = list(HISTORY_ALL_FIELDS)
+    if include_context_columns:
+        for context_column in ("object_type", "object_subtype", "type_name"):
+            if context_column in frame.columns and context_column not in ordered_columns:
+                ordered_columns.append(context_column)
+
+    frame = frame.reindex(columns=ordered_columns)
     return frame.sort_values(
         by=["timestamp_utc", "source", "canonical_item_id"],
         kind="stable",
@@ -57,3 +70,15 @@ def _resolve_canonical_item_id(result: ExtractionRunResult) -> str:
         if normalized:
             return normalized
     return str(result.target.item_id)
+
+
+def _extract_context_fields(result: ExtractionRunResult) -> dict[str, str | None]:
+    extracted: dict[str, str | None] = {}
+    for field_name in ("object_type", "object_subtype", "type_name"):
+        raw_value = result.target.context.get(field_name)
+        if isinstance(raw_value, str):
+            value = raw_value.strip()
+            extracted[field_name] = value or None
+        else:
+            extracted[field_name] = None
+    return extracted

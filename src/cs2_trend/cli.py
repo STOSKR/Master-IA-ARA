@@ -382,10 +382,7 @@ def phase0_discover(
         f"pages={len(payloads)} discovered={len(discovered_rows)} unique={len(merged_records)}"
     )
     if external_categories:
-        typer.echo(
-            "- recursive_fallback categories="
-            + ", ".join(external_categories)
-        )
+        typer.echo("- recursive_fallback categories=" + ", ".join(external_categories))
     for label, path in output_paths.items():
         typer.echo(f"- {label}: {path}")
 
@@ -406,10 +403,43 @@ def phase1_extract(
             help="Catalog JSON/CSV path. Defaults to latest JSON in data/catalog/.",
         ),
     ] = None,
+    max_iterations: Annotated[
+        int,
+        typer.Option(
+            "--max-iterations",
+            min=1,
+            help="Maximum autonomous extraction iterations with quality validation.",
+        ),
+    ] = 3,
+    min_success_rate: Annotated[
+        float,
+        typer.Option(
+            "--min-success-rate",
+            min=0.0,
+            max=1.0,
+            help="Minimum success rate required to pass iterative validation.",
+        ),
+    ] = 0.85,
+    min_raw_rows: Annotated[
+        int,
+        typer.Option(
+            "--min-raw-rows",
+            min=0,
+            help="Minimum number of raw rows required to pass iterative validation.",
+        ),
+    ] = 100,
+    max_json_rows: Annotated[
+        int,
+        typer.Option(
+            "--max-json-rows",
+            min=1,
+            help="Maximum rows per persisted JSON shard file.",
+        ),
+    ] = 2000,
 ) -> None:
     """Run asynchronous historical extraction with quality gates and persisted outputs."""
 
-    from cs2_trend.phase1.services import execute_phase1_extraction
+    from cs2_trend.phase1.services import execute_phase1_extraction_iterative
 
     config, _ = _get_state(ctx)
     selected_sources = (
@@ -418,11 +448,15 @@ def phase1_extract(
 
     try:
         result = asyncio.run(
-            execute_phase1_extraction(
+            execute_phase1_extraction_iterative(
                 config=config,
                 selected_sources=selected_sources,
                 limit_items=limit_items,
                 catalog_path=catalog_file,
+                max_iterations=max_iterations,
+                min_success_rate=min_success_rate,
+                min_raw_rows=min_raw_rows,
+                max_json_rows_per_file=max_json_rows,
             )
         )
     except (ValueError, FileNotFoundError) as exc:
@@ -438,19 +472,31 @@ def phase1_extract(
             "total_jobs": result.total_jobs,
             "success_count": result.success_count,
             "failure_count": result.failure_count,
+            "iteration": result.iteration,
+            "success_rate": result.success_rate,
+            "raw_row_count": result.raw_row_count,
+            "quality_passed": result.quality_passed,
         },
     )
 
     typer.echo(
         "Phase1 extraction completed: "
         f"run_id={result.run_id} jobs={result.total_jobs} "
-        f"success={result.success_count} failure={result.failure_count}"
+        f"success={result.success_count} failure={result.failure_count} "
+        f"iteration={result.iteration} success_rate={result.success_rate:.3f} "
+        f"raw_rows={result.raw_row_count} quality_passed={result.quality_passed}"
     )
     typer.echo(f"- metrics: {result.metrics_path}")
+    if result.quality_report_path is not None:
+        typer.echo(f"- quality_report: {result.quality_report_path}")
     for output in result.raw_paths:
         typer.echo(f"- raw: {output}")
+    for output in result.raw_json_paths:
+        typer.echo(f"- raw_json: {output}")
     for output in result.curated_paths:
         typer.echo(f"- curated: {output}")
+    for output in result.curated_json_paths:
+        typer.echo(f"- curated_json: {output}")
 
 
 def main() -> None:

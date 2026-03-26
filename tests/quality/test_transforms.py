@@ -82,3 +82,56 @@ def test_extraction_results_to_history_frame_returns_empty_schema_when_no_succes
     assert isinstance(frame, pd.DataFrame)
     assert frame.empty
     assert list(frame.columns) == list(HISTORY_ALL_FIELDS)
+
+
+def test_extraction_results_to_history_frame_includes_context_columns_when_requested() -> None:
+    target = ExtractionTarget(
+        item_id="item-2",
+        market_hash_name="AWP | Neo-Noir",
+        context={
+            "canonical_item_id": "awp__neo_noir",
+            "object_type": "weapon",
+            "object_subtype": "rifle",
+            "type_name": "Weapon",
+        },
+    )
+    sample = ProbeSample(
+        source_name="steam",
+        url="https://example.test/history",
+        status_code=200,
+        headers={},
+        body=b"{}",
+    )
+    extraction = ConnectorExtraction(
+        source_name="steam",
+        target=target,
+        sample=sample,
+        points=(
+            PricePoint(
+                timestamp=datetime(2026, 3, 25, 0, 0, tzinfo=UTC),
+                price=10.5,
+                volume=3,
+                currency="usd",
+            ),
+        ),
+    )
+    success_result = ExtractionRunResult(
+        source_name="steam",
+        target=target,
+        success=True,
+        attempts=1,
+        started_at=datetime(2026, 3, 25, 0, 0, tzinfo=UTC),
+        finished_at=datetime(2026, 3, 25, 0, 0, tzinfo=UTC),
+        duration_seconds=0.1,
+        extraction=extraction,
+    )
+
+    frame = extraction_results_to_history_frame(
+        [success_result],
+        include_context_columns=True,
+    )
+
+    assert "object_type" in frame.columns
+    assert "object_subtype" in frame.columns
+    assert "type_name" in frame.columns
+    assert frame.loc[0, "object_type"] == "weapon"
