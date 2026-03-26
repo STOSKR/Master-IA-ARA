@@ -26,15 +26,18 @@
 ## Accumulated Context
 
 ### Decisions
+
 - v1 se mantiene estrictamente en Phase 0 + Phase 1.
 - Roadmap secuencial: primero identidad canónica y catálogo, luego extracción multifuente robusta.
 - El gate de aprobación explícita del usuario se aplica al cierre de Phase 0.
 
 ### TODOs
+
 - Definir planes ejecutables para Phase 0.
 - Ejecutar planificación detallada de Phase 1 tras aprobación de cierre de Phase 0.
 
 ### Blockers
+
 - Ninguno en artefactos de roadmap.
 
 ## Session Continuity
@@ -43,17 +46,20 @@
 - **Next Recommended Step**: Planificar Phase 0 con criterios de aceptación verificables.
 - **Resume Command**: `/gsd-plan-phase 0`
 
----
+______________________________________________________________________
+
 *Last updated: 2026-03-25*
 
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.

@@ -12,14 +12,14 @@ Layered, contract-first pipeline with strict boundaries:
    - Catalog discovery (CSFloat)
    - Source-specific async extractors (Steam, Steamdt, Buff163, CS.Money, CSFloat)
    - Raw response capture + anomaly dump pipeline
-2. **Curation Layer (Phase 1 hardening, Phase 2 input)**
+1. **Curation Layer (Phase 1 hardening, Phase 2 input)**
    - Normalization to canonical tabular schema
    - Data quality checks (Pandera)
    - Time-series persistence (partitioned datasets)
-3. **ML Preparation Layer (Phase 2-3)**
+1. **ML Preparation Layer (Phase 2-3)**
    - Window builder + context enricher
    - Future-aware labeler (bullish/bearish/neutral)
-4. **Model Layer (Phase 4-6)**
+1. **Model Layer (Phase 4-6)**
    - Baseline trainer (XGBoost)
    - Inference runner (foundation model + baseline)
    - Fine-tuning pipeline + comparative evaluator
@@ -65,17 +65,17 @@ Future extension:
 
 1. **Foundation runtime (shared config + logging + retries + path policy)**
    - Needed first because every component must obey user-space, reproducibility, and failure-dump rules.
-2. **Phase 0: `catalog_service` + probe workflow for CSFloat**
+1. **Phase 0: `catalog_service` + probe workflow for CSFloat**
    - Required dependency for all extractors; creates the object universe and identifiers.
-3. **Shared extraction kernel (`source_connector` interface + `extract_pipeline`)**
+1. **Shared extraction kernel (`source_connector` interface + `extract_pipeline`)**
    - Prevents five monolithic scripts and enforces a uniform async contract.
-4. **Per-source adapters (Steam, Steamdt, Buff163, CS.Money, CSFloat)**
+1. **Per-source adapters (Steam, Steamdt, Buff163, CS.Money, CSFloat)**
    - Implemented behind same interface; each can evolve without touching orchestration.
-5. **Raw/anomaly stores + operational telemetry**
+1. **Raw/anomaly stores + operational telemetry**
    - Needed early for debugging anti-bot issues and unknown payload shapes.
-6. **Normalization + quality gate + curated `timeseries_store`**
+1. **Normalization + quality gate + curated `timeseries_store`**
    - Completes Phase 1 deliverable and provides stable input for Phase 2+.
-7. **Future-ready read contracts (`dataset_builder` input API)**
+1. **Future-ready read contracts (`dataset_builder` input API)**
    - Add now as interface skeleton to avoid later breaking changes.
 
 ## User-Space / No-Admin Constraints (Design Implications)
@@ -89,16 +89,19 @@ Future extension:
 ## Patterns to Follow
 
 ### Pattern 1: Source Adapter + Canonical Contract
+
 **What:** Each market source implements a strict adapter interface; canonical schema lives outside adapters.
 **When:** Always, including exploratory/probe code promotion.
 **Why:** Keeps source volatility isolated and protects downstream preprocess/label/train modules.
 
 ### Pattern 2: Bronze/Silver Separation
+
 **What:** Keep immutable raw payloads (bronze) separate from validated canonical time-series (silver).
 **When:** From first extraction run onward.
 **Why:** Enables replay, auditability, and parser evolution without re-scraping.
 
 ### Pattern 3: Fail-Closed Quality Gate
+
 **What:** Data moves downstream only after schema validation and timestamp/value checks.
 **When:** Before writing curated time-series.
 **Why:** Prevents silent model drift caused by malformed upstream payloads.
@@ -106,14 +109,17 @@ Future extension:
 ## Anti-Patterns to Avoid
 
 ### Anti-Pattern 1: Monolithic extractor scripts
+
 **Why bad:** Coupled logic, hard debugging, no per-source isolation.
 **Instead:** Shared extraction kernel + source adapters.
 
 ### Anti-Pattern 2: Direct connector-to-training coupling
+
 **Why bad:** Future phases become fragile and non-reproducible.
 **Instead:** Force all consumers through curated store contracts.
 
 ### Anti-Pattern 3: Skipping probe dumps on unknown payloads
+
 **Why bad:** Hidden parse assumptions and brittle fixes.
 **Instead:** Mandatory probe + raw dump before parser updates.
 
@@ -140,13 +146,15 @@ Future extension:
 - Medium confidence on long-term scaling details (designed to be compatible with stated future phases, not yet validated by real throughput metrics).
 
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.

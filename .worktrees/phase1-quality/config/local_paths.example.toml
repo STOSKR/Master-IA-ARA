@@ -1,7 +1,0 @@
-[storage]
-raw_root = "~/cs2-price-trend-intel/data/raw"
-curated_root = "~/cs2-price-trend-intel/data/curated"
-dumps_root = "~/cs2-price-trend-intel/data/dumps"
-
-[runtime]
-timezone = "UTC"

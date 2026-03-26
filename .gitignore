@@ -1,4 +1,7 @@
 .venv/
+.venv*/
+venv/
+venv*/
 
 # Python cache/bytecode
 __pycache__/
@@ -19,9 +22,22 @@ dumps/
 .dumps/
 tmp/
 uv.lock
+.tools/
 
 # Local authenticated session artifacts (must never be committed)
 cookies.json
 cookies.*.json
 auth_cookies.json
 auth_cookies.*.json
+
+# Local environment and secret material
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.crt
+
+# Local multi-worktree copies and Node deps
+.worktrees/
+node_modules/

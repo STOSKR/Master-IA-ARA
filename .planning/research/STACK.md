@@ -1,12 +1,13 @@
 # Technology Stack
 
-**Project:** CS2 Price Trend Intelligence  
-**Researched:** 2026-03-25  
+**Project:** CS2 Price Trend Intelligence\
+**Researched:** 2026-03-25\
 **Scope:** Stack base para extracción + preparación + baseline ML en entorno **user-space** (sin privilegios de administrador).
 
 ## Recommended Stack
 
 ### Core Runtime & Environment
+
 | Technology | Version / Range | Purpose | Why (2025-2026) | Confidence |
 |------------|------------------|---------|------------------|------------|
 | Python | `>=3.12,<3.14` | Runtime principal | Ecosistema de datos/ML estable, tipado moderno, buen soporte de libs clave | MEDIUM |
@@ -14,6 +15,7 @@
 | pydantic + pydantic-settings | `>=2.12,<3` / `>=2.13,<3` | Configuración tipada y validación de payloads | Contratos de datos/config centralizados y estrictos para extractores multi-fuente | HIGH |
 
 ### Data Acquisition (Async + Resilience)
+
 | Library | Version / Range | Purpose | Why | Tradeoff | Confidence |
 |---------|------------------|---------|-----|----------|------------|
 | httpx | `>=0.28,<0.29` | Cliente HTTP async principal | API moderna, HTTP/2, ergonomía para servicios JSON | Menos “battle-tested legacy” que aiohttp en algunos casos extremos | MEDIUM |
@@ -22,6 +24,7 @@
 | playwright | `>=1.58,<2` | Descubrir/interceptar calls en webs dinámicas (Buff/CS.Money) | Necesario cuando HTML no contiene datos reales y hay app dinámica | Coste operativo mayor (descarga de browsers y tiempos) | HIGH |
 
 ### DataFrame, Schema & Local Storage
+
 | Technology | Version / Range | Purpose | Why | Tradeoff | Confidence |
 |------------|------------------|---------|-----|----------|------------|
 | pandas | `>=3.0,<3.1` | DataFrame principal de pipeline | Máxima compatibilidad con validación, testing y ecosistema ML clásico | Menos rendimiento bruto que Polars en ciertos workloads | MEDIUM |
@@ -30,6 +33,7 @@
 | pandera | `>=0.30,<0.31` | Validación de esquemas tabulares | Requisito explícito del proyecto, integración directa con pandas y checks | Curva de diseño de esquemas | HIGH |
 
 ### Modeling & Experimentation (Baseline)
+
 | Library | Version / Range | Purpose | Why | Tradeoff | Confidence |
 |---------|------------------|---------|-----|----------|------------|
 | scikit-learn | `>=1.8,<1.9` | Split, métricas, utilidades de baseline | Estándar para clasificación tabular y evaluación reproducible | No cubre boosting avanzado al nivel de XGBoost | HIGH |
@@ -38,6 +42,7 @@
 | mlflow | `>=3.10,<3.11` | Tracking local de experimentos | Trazabilidad de runs/params/metrics sin infraestructura compleja | Añade capa operativa adicional | MEDIUM |
 
 ### Quality & Developer Tooling
+
 | Tool | Version / Range | Purpose | Why | Confidence |
 |------|------------------|---------|-----|------------|
 | ruff | `>=0.15,<0.16` | Lint + format | Rápido, reemplaza combos más pesados, requisito de proyecto | HIGH |
@@ -45,12 +50,14 @@
 | pytest | `>=9.0,<10` | Pruebas automáticas | Estándar de facto para pipelines Python | HIGH |
 
 ## Opinionated Defaults (MVP de este proyecto)
+
 - **Lenguaje/plataforma:** Python + `uv`.
 - **Extracción:** `httpx` como cliente por defecto + `tenacity`; escalar a `playwright` solo cuando la fuente lo exija.
 - **Datos:** `pandas` + `pandera` + Parquet (`pyarrow`), y `duckdb` como capa analítica local.
 - **ML baseline:** `xgboost` + `scikit-learn` + `mlflow` (tracking local).
 
 ## Alternatives Considered
+
 | Category | Recommended | Alternative | Why Not (for this project now) |
 |----------|-------------|-------------|---------------------------------|
 | Env manager | uv | Poetry/Pipenv | Más fricción y menor velocidad de resolución en flujos iterativos de scraping/ML |
@@ -60,6 +67,7 @@
 | Pipeline orchestration | CLI/cron user-space + scripts modulares | Airflow autohosteado | Sobreingeniería para v1, mayor carga operativa |
 
 ## What NOT to Use (v1)
+
 | Avoid | Why |
 |------|-----|
 | Scraping HTML-only (BeautifulSoup como estrategia principal) | Steam/Buff/CS.Money son dinámicos; los datos útiles suelen venir por JSON/API interna |
@@ -68,6 +76,7 @@
 | Introducir Spark/Dask desde inicio | Complejidad innecesaria antes de validar extracción, limpieza y etiquetado |
 
 ## Installation (user-space first)
+
 ```bash
 # 1) Tooling local (sin admin) y Python del proyecto
 uv python install 3.12
@@ -86,6 +95,7 @@ uv run playwright install
 ```
 
 ## Confidence Notes
+
 | Area | Level | Why |
 |------|-------|-----|
 | Packaging/tooling (`uv`) | HIGH | Evidencia en docs oficiales + versión actual verificada |
@@ -95,6 +105,7 @@ uv run playwright install
 | “Standard 2025-2026” claim global | MEDIUM | Basado en estado actual de ecosistema + verificación parcial vía fuentes oficiales/PyPI |
 
 ## Sources
+
 - https://docs.astral.sh/uv/
 - https://pypi.org/pypi/uv/json
 - https://playwright.dev/python/docs/intro
@@ -119,13 +130,15 @@ uv run playwright install
 - https://pypi.org/pypi/pytest/json
 
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.

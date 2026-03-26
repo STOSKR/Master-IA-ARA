@@ -101,22 +101,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QAG-04 | Phase 1 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 22 total
 - Mapped to phases: 22
 - Unmapped: 0 ✓
 
----
+______________________________________________________________________
+
 *Requirements defined: 2026-03-25*
 *Last updated: 2026-03-25 after initial definition*
 
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.

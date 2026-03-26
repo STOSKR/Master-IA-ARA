@@ -1,7 +1,7 @@
 # Feature Landscape
 
-**Domain:** Internal CS2 skin market trend analysis/prediction platform  
-**Researched:** 2026-03-25  
+**Domain:** Internal CS2 skin market trend analysis/prediction platform\
+**Researched:** 2026-03-25\
 **Scope focus:** v1 limited to Phase 0-1 (master catalog + price history extraction)
 
 ## v1 Boundaries (Realistic)
@@ -65,10 +65,10 @@ Observability + retry/backoff + anomalous dumps
 Prioritize in this exact order:
 
 1. Master catalog bootstrap + canonical keys.
-2. Raw sample inspection workflow per source.
-3. Async multi-source extractors producing unified historical tables.
-4. Retry/backoff, dumps, and minimal observability.
-5. Basic schema/quality gates.
+1. Raw sample inspection workflow per source.
+1. Async multi-source extractors producing unified historical tables.
+1. Retry/backoff, dumps, and minimal observability.
+1. Basic schema/quality gates.
 
 Defer unless schedule is ahead:
 
@@ -81,14 +81,17 @@ Defer unless schedule is ahead:
 - `c:\Master-IA-ARA\.planning\PROJECT.md`
 - `c:\Master-IA-ARA\claude.md`
 - `c:\Master-IA-ARA\orquestador.md`
+
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.

@@ -12,11 +12,11 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ## Constraint Lock
 
 1. Entorno **sin privilegios de administrador**.
-2. Arquitectura **modular** (prohibidos scripts monolíticos).
-3. Tipado obligatorio en todas las funciones/métodos.
-4. Exploración previa obligatoria por fuente antes de parser definitivo.
-5. Manejo de fallos obligatorio: retries + backoff + dumps anómalos con timestamp.
-6. Validación con Mypy, Ruff, Pytest y Pandera.
+1. Arquitectura **modular** (prohibidos scripts monolíticos).
+1. Tipado obligatorio en todas las funciones/métodos.
+1. Exploración previa obligatoria por fuente antes de parser definitivo.
+1. Manejo de fallos obligatorio: retries + backoff + dumps anómalos con timestamp.
+1. Validación con Mypy, Ruff, Pytest y Pandera.
 
 ## Work Breakdown
 
@@ -25,6 +25,7 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent A — Branch: `feat/phase0-foundation`
 
 **Scope**
+
 - Scaffold del proyecto Python.
 - Configuración central (`settings`, semillas, rutas user-space).
 - Logging, retries y utilidades de dump.
@@ -32,6 +33,7 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 - CLI base para orquestación de jobs.
 
 **Deliverables**
+
 - Estructura modular `src/`.
 - `pyproject.toml`, config de Ruff/Mypy/Pytest.
 - Módulos base de dominio y utilidades.
@@ -39,11 +41,13 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent B — Branch: `feat/phase0-csfloat-catalog`
 
 **Scope**
+
 - Prober de CSFloat para inspección y volcado de muestra.
 - Servicio de catálogo maestro con persistencia local.
 - Generación de `canonical_item_id`.
 
 **Deliverables**
+
 - `probe_runner` para CSFloat.
 - `catalog_service` con salida tabular.
 - Persistencia en `.data/catalog/`.
@@ -51,12 +55,14 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent C — Branch: `feat/phase1-extraction-kernel`
 
 **Scope**
+
 - Núcleo de extracción AsyncIO compartido.
 - Contrato de conectores por fuente.
 - Orquestador concurrente multifuente.
 - Observabilidad mínima por ejecución (`run_id`, métricas de recuento y fallos).
 
 **Deliverables**
+
 - Interfaces y pipeline de extracción.
 - Política global de retries/backoff.
 - Registro de eventos operativos.
@@ -66,6 +72,7 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent D — Branch: `feat/phase1-connectors-steam-steamdt`
 
 **Scope**
+
 - Conectores y probes para Steam + Steamdt.
 - Inspección previa obligatoria y dumps de respuesta.
 - Parser hacia contrato tabular unificado.
@@ -73,6 +80,7 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent E — Branch: `feat/phase1-connectors-buff-csmoney-csfloat`
 
 **Scope**
+
 - Conectores y probes para Buff163 + CS.Money + CSFloat.
 - Gestión explícita de errores de sesión/bloqueo.
 - Parser hacia contrato tabular unificado.
@@ -80,6 +88,7 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 ### Subagent F — Branch: `feat/phase1-quality-gates`
 
 **Scope**
+
 - Validación Pandera del esquema canónico.
 - Detección de duplicados y saneamiento básico de outliers.
 - Persistencia `raw`, `dumps`, `curated`.
@@ -89,13 +98,13 @@ El trabajo se ejecuta con subagentes independientes en ramas separadas, commits 
 Por cada rama de subagente de implementación:
 
 1. Lanzar subagente revisor en la misma rama.
-2. Ejecutar auditoría de:
+1. Ejecutar auditoría de:
    - Ruff
    - Mypy
    - Pytest
    - consistencia arquitectónica y tipado
-3. Si detecta hallazgos: crear corrección en la misma rama y recommit.
-4. Repetir bucle hasta resultado limpio o con incidencias no bloqueantes explícitas.
+1. Si detecta hallazgos: crear corrección en la misma rama y recommit.
+1. Repetir bucle hasta resultado limpio o con incidencias no bloqueantes explícitas.
 
 ## Integration Strategy
 
@@ -106,18 +115,20 @@ Por cada rama de subagente de implementación:
    - `feat/phase1-connectors-steam-steamdt`
    - `feat/phase1-connectors-buff-csmoney-csfloat`
    - `feat/phase1-quality-gates`
-2. Resolver conflictos manteniendo contratos de interfaz compartidos.
-3. Ejecutar validación final del workspace completo.
+1. Resolver conflictos manteniendo contratos de interfaz compartidos.
+1. Ejecutar validación final del workspace completo.
 
 ## Verification Criteria (Done Definition)
 
 ### Phase 0 done
+
 - Lectura/contexto de raíz trazable en artefactos.
 - Catálogo maestro CSFloat con `canonical_item_id` persistido.
 - Evidencia de probe JSON previa a parser definitivo.
 - Base modular tipada.
 
 ### Phase 1 done
+
 - Async extraction de 5 fuentes implementada vía núcleo común.
 - Probe por fuente + dumps anómalos timestamped.
 - Retries/backoff activos por defecto.
@@ -132,13 +143,15 @@ Por cada rama de subagente de implementación:
 - Si un revisor detecta violación de modularidad o tipado, la rama no se integra hasta corregir.
 
 ## Maintenance Update 2026-03-25
+
 - [x] Step 1 completed: duplicate/unused code cleanup and refactor in scraper-related modules.
 - [x] Step 2 completed: live endpoint validation performed, blocking/auth failures reproduced, and scraper hardening applied.
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
 ## Next Development Steps
+
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.
-2. Re-run phase0 probe and phase1 extraction using authenticated session.
-3. Validate persisted raw/curated outputs and metrics artifacts in data directories.
-4. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
+1. Re-run phase0 probe and phase1 extraction using authenticated session.
+1. Validate persisted raw/curated outputs and metrics artifacts in data directories.
+1. Continue with Phase 2 windowing implementation once authenticated extraction is stable.
