@@ -4,16 +4,28 @@ import asyncio
 import os
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import typer
 
 from cs2_trend.core.config import AppConfig, ensure_runtime_directories, load_config
 from cs2_trend.core.logging import configure_logging, get_logger
-from cs2_trend.core.retry import RetryPolicy
+from cs2_trend.core.retry import RetryPolicy, run_with_retry
 from cs2_trend.core.run_context import RunContext
 from cs2_trend.core.seed import set_global_seed
+from cs2_trend.phase0.discovery import (
+    build_discovery_summary,
+    build_missing_fields_report,
+    discover_catalog_records_from_external_dataset,
+    discover_catalog_records_from_payload,
+    find_low_volume_categories,
+    has_missing_fields,
+    merge_catalog_records,
+    write_discovery_outputs,
+)
 from cs2_trend.phase0.http_clients import UrllibJsonHttpClient
+from cs2_trend.phase0.models import JsonValue
 from cs2_trend.phase0.repositories import FileCatalogRepository, FileProbeDumpRepository
 from cs2_trend.phase0.services import (
     CatalogService,
@@ -35,6 +47,38 @@ class CatalogOutputMode(StrEnum):
     JSON = "json"
     CSV = "csv"
     BOTH = "both"
+
+
+_EXTERNAL_REFERENCE_ENDPOINTS: dict[str, str] = {
+    "weapon": (
+        "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/"
+        "en/skins_not_grouped.json"
+    ),
+    "sticker": (
+        "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/"
+        "en/stickers.json"
+    ),
+    "container": (
+        "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/"
+        "en/crates.json"
+    ),
+    "agent": (
+        "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/"
+        "en/agents.json"
+    ),
+    "charm": (
+        "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/"
+        "en/keychains.json"
+    ),
+}
+
+_MINIMUM_DISCOVERY_COUNTS: dict[str, int] = {
+    "weapon": 1000,
+    "sticker": 500,
+    "container": 50,
+    "agent": 20,
+    "charm": 30,
+}
 
 
 @app.callback()
@@ -205,6 +249,147 @@ def phase0_catalog(
         typer.echo(f"- csv: {result.csv_path}")
 
 
+@phase0_app.command("discover")
+def phase0_discover(
+    ctx: typer.Context,
+    endpoint: Annotated[
+        str | None,
+        typer.Option(
+            "--endpoint",
+            help="Base CSFloat endpoint for discovery (default: configured probe endpoint).",
+        ),
+    ] = None,
+    max_pages: Annotated[
+        int,
+        typer.Option(
+            "--max-pages",
+            min=1,
+            help="Maximum paginated result pages to inspect.",
+        ),
+    ] = 30,
+    page_limit: Annotated[
+        int,
+        typer.Option(
+            "--page-limit",
+            min=1,
+            max=50,
+            help="Listings page size per request (CSFloat max is typically 50).",
+        ),
+    ] = 50,
+    output_name: Annotated[
+        str,
+        typer.Option(
+            "--output-name",
+            "-o",
+            help="Base output filename under data/catalog/.",
+        ),
+    ] = "master_catalog_possibilities",
+    recursive_fallback: Annotated[
+        bool,
+        typer.Option(
+            "--recursive-fallback/--no-recursive-fallback",
+            help=(
+                "Augment low-volume categories recursively using external "
+                "reference datasets."
+            ),
+        ),
+    ] = True,
+) -> None:
+    """Discover full catalog possibilities from paginated CSFloat listings payloads."""
+
+    config, run_context = _get_state(ctx)
+    resolved_endpoint = endpoint or config.csfloat_probe_endpoint
+    if resolved_endpoint is None or not resolved_endpoint.strip():
+        raise typer.BadParameter(
+            "CSFloat endpoint is not configured. Set --endpoint or CS2TREND_CSFLOAT_PROBE_ENDPOINT."
+        )
+
+    headers = _build_csfloat_request_headers()
+    dump_store = FileProbeDumpRepository(base_dir=config.probe_dump_dir)
+    http_client = UrllibJsonHttpClient(timeout_seconds=config.http_timeout_seconds)
+
+    payloads = asyncio.run(
+        _capture_discovery_payloads(
+            endpoint=resolved_endpoint,
+            max_pages=max_pages,
+            page_limit=page_limit,
+            run_id=run_context.run_id,
+            http_client=http_client,
+            dump_store=dump_store,
+            request_headers=headers,
+        )
+    )
+
+    discovered_rows: list[dict[str, object]] = []
+    for payload in payloads:
+        discovered_rows.extend(discover_catalog_records_from_payload(payload))
+
+    merged_records = merge_catalog_records(tuple(discovered_rows))
+    summary = build_discovery_summary(merged_records)
+
+    external_categories: tuple[str, ...] = ()
+    if recursive_fallback:
+        external_categories = find_low_volume_categories(
+            summary,
+            _MINIMUM_DISCOVERY_COUNTS,
+        )
+        if external_categories:
+            external_payloads = asyncio.run(
+                _capture_external_reference_payloads(
+                    categories=external_categories,
+                    run_id=run_context.run_id,
+                    http_client=http_client,
+                    dump_store=dump_store,
+                )
+            )
+            for object_type, external_payload in external_payloads:
+                discovered_rows.extend(
+                    discover_catalog_records_from_external_dataset(
+                        object_type=object_type,
+                        payload=external_payload,
+                    )
+                )
+
+            merged_records = merge_catalog_records(tuple(discovered_rows))
+            summary = build_discovery_summary(merged_records)
+
+    missing_fields = build_missing_fields_report(merged_records)
+    output_paths = write_discovery_outputs(
+        base_dir=config.catalog_dir,
+        output_name=output_name,
+        records=merged_records,
+        summary=summary,
+        missing_fields=missing_fields,
+        include_missing_report=has_missing_fields(missing_fields),
+    )
+
+    logger = get_logger(__name__)
+    logger.info(
+        "phase0 discovery completed",
+        extra={
+            "run_id": run_context.run_id,
+            "pages": len(payloads),
+            "record_count": len(discovered_rows),
+            "unique_record_count": len(merged_records),
+            "output_name": output_name,
+            "recursive_fallback": recursive_fallback,
+            "external_category_count": len(external_categories),
+        },
+    )
+
+    typer.echo(
+        "Catalog discovery completed: "
+        f"pages={len(payloads)} discovered={len(discovered_rows)} unique={len(merged_records)}"
+    )
+    if external_categories:
+        typer.echo(
+            "- recursive_fallback categories="
+            + ", ".join(external_categories)
+        )
+    for label, path in output_paths.items():
+        typer.echo(f"- {label}: {path}")
+
+
 @phase1_app.command("extract")
 def phase1_extract(
     ctx: typer.Context,
@@ -272,3 +457,167 @@ def main() -> None:
     """Execute CLI application."""
 
     app()
+
+
+def _build_csfloat_request_headers() -> dict[str, str]:
+    headers: dict[str, str] = {}
+    api_key = os.getenv("CSFLOAT_API_KEY")
+    cookie = os.getenv("CSFLOAT_COOKIE")
+    custom_user_agent = os.getenv("CSFLOAT_USER_AGENT")
+    if api_key:
+        headers["Authorization"] = api_key
+    if cookie:
+        headers["Cookie"] = cookie
+    if custom_user_agent:
+        headers["User-Agent"] = custom_user_agent
+    return headers
+
+
+async def _capture_discovery_payloads(
+    *,
+    endpoint: str,
+    max_pages: int,
+    page_limit: int,
+    run_id: str,
+    http_client: UrllibJsonHttpClient,
+    dump_store: FileProbeDumpRepository,
+    request_headers: dict[str, str],
+) -> tuple[JsonValue, ...]:
+    payloads: list[JsonValue] = []
+    cursor: str | None = None
+
+    for _ in range(max_pages):
+        page_endpoint = _with_query_params(
+            endpoint,
+            {
+                "limit": str(page_limit),
+                **({"cursor": cursor} if cursor else {}),
+            },
+        )
+        response = await http_client.fetch_json(
+            endpoint=page_endpoint,
+            headers=request_headers,
+        )
+
+        dump_store.write_probe_dump(
+            source="csfloat",
+            endpoint=page_endpoint,
+            run_id=run_id,
+            status_code=response.status_code,
+            payload=response.payload,
+        )
+
+        if response.status_code >= 400:
+            raise RuntimeError(
+                "CSFloat discovery request failed "
+                f"status={response.status_code} endpoint={page_endpoint}"
+            )
+
+        payloads.append(response.payload)
+
+        rows = _payload_row_count(response.payload)
+        next_cursor = _payload_cursor(response.payload)
+        if rows == 0 or next_cursor is None or next_cursor == cursor:
+            break
+        cursor = next_cursor
+
+    return tuple(payloads)
+
+
+async def _capture_external_reference_payloads(
+    *,
+    categories: tuple[str, ...],
+    run_id: str,
+    http_client: UrllibJsonHttpClient,
+    dump_store: FileProbeDumpRepository,
+) -> tuple[tuple[str, JsonValue], ...]:
+    tasks = [
+        _fetch_external_reference_category(
+            category=category,
+            run_id=run_id,
+            http_client=http_client,
+            dump_store=dump_store,
+        )
+        for category in categories
+        if category in _EXTERNAL_REFERENCE_ENDPOINTS
+    ]
+    if not tasks:
+        return ()
+    results = await asyncio.gather(*tasks)
+    return tuple(results)
+
+
+async def _fetch_external_reference_category(
+    *,
+    category: str,
+    run_id: str,
+    http_client: UrllibJsonHttpClient,
+    dump_store: FileProbeDumpRepository,
+) -> tuple[str, JsonValue]:
+    endpoint = _EXTERNAL_REFERENCE_ENDPOINTS[category]
+    logger = get_logger(__name__)
+
+    async def _operation() -> Any:
+        return await http_client.fetch_json(endpoint=endpoint)
+
+    response = await run_with_retry(
+        _operation,
+        RetryPolicy(max_attempts=3, base_delay_seconds=0.8, exponential_factor=2.0),
+        on_retry=(
+            lambda attempt, exc, delay: logger.warning(
+                "external category fetch retry",
+                extra={
+                    "category": category,
+                    "attempt": attempt,
+                    "delay_seconds": round(delay, 3),
+                    "error": str(exc),
+                },
+            )
+        ),
+    )
+
+    if response.status_code >= 400:
+        raise RuntimeError(
+            "External category fetch failed "
+            f"category={category} status={response.status_code} endpoint={endpoint}"
+        )
+
+    dump_store.write_probe_dump(
+        source=f"external_{category}",
+        endpoint=endpoint,
+        run_id=run_id,
+        status_code=response.status_code,
+        payload=response.payload,
+    )
+    return category, response.payload
+
+
+def _with_query_params(endpoint: str, params: dict[str, str]) -> str:
+    parsed = urlsplit(endpoint)
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    query.update(params)
+    return urlunsplit(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            urlencode(query),
+            parsed.fragment,
+        )
+    )
+
+
+def _payload_row_count(payload: JsonValue) -> int:
+    if isinstance(payload, dict):
+        data = payload.get("data")
+        if isinstance(data, list):
+            return len(data)
+    return 0
+
+
+def _payload_cursor(payload: JsonValue) -> str | None:
+    if isinstance(payload, dict):
+        cursor = payload.get("cursor")
+        if isinstance(cursor, str) and cursor.strip():
+            return cursor.strip()
+    return None
