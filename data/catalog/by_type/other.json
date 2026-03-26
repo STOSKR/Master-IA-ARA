@@ -1,0 +1,25 @@
+[
+  {
+    "canonical_item_id": "other__shadow_daggers",
+    "source": "csfloat",
+    "object_type": "other",
+    "object_subtype": "Skin",
+    "type_name": "Skin",
+    "market_hash_name": "★ StatTrak™ Shadow Daggers",
+    "item_name": "★ Shadow Daggers",
+    "weapon_type": null,
+    "weapon_family": null,
+    "weapon_name": null,
+    "skin_name": null,
+    "wear": "Battle-Scarred",
+    "rarity": "Covert",
+    "collection": "The Shadow Collection",
+    "is_stattrak": true,
+    "is_souvenir": false,
+    "listing_id": "956874950462015274",
+    "asset_id": "49928126264",
+    "sample_price": 11199.0,
+    "sample_currency": "USD",
+    "raw_type": "skin"
+  }
+]

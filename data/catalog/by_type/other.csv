@@ -1,0 +1,2 @@
+canonical_item_id,source,object_type,object_subtype,type_name,market_hash_name,item_name,weapon_type,weapon_family,weapon_name,skin_name,wear,rarity,collection,is_stattrak,is_souvenir,listing_id,asset_id,sample_price,sample_currency,raw_type
+other__shadow_daggers,csfloat,other,Skin,Skin,★ StatTrak™ Shadow Daggers,★ Shadow Daggers,,,,,Battle-Scarred,Covert,The Shadow Collection,True,False,956874950462015274,49928126264,11199.0,USD,skin
