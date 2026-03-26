@@ -1,0 +1,176 @@
+{
+  "weapon": {
+    "weapon_type": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "weapon_family": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "weapon_name": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "skin_name": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "rarity": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 15448,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  },
+  "sticker": {
+    "item_name": {
+      "missing_count": 0,
+      "total": 9771,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "rarity": {
+      "missing_count": 0,
+      "total": 9771,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "sample_price": {
+      "missing_count": 9657,
+      "total": 9771,
+      "missing_ratio": 0.9883,
+      "examples": [
+        "sticker__sticker_00_nation_glitter_rio_2022",
+        "sticker__sticker_00_nation_gold_rio_2022",
+        "sticker__sticker_00_nation_holo_rio_2022",
+        "sticker__sticker_00_nation_rio_2022",
+        "sticker__sticker_100_thieves_2020_rmr"
+      ]
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 9771,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  },
+  "container": {
+    "item_name": {
+      "missing_count": 0,
+      "total": 475,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "sample_price": {
+      "missing_count": 465,
+      "total": 475,
+      "missing_ratio": 0.9789,
+      "examples": [
+        "container__10_year_birthday_sticker_capsule",
+        "container__2020_rmr_challengers",
+        "container__2020_rmr_contenders",
+        "container__2020_rmr_legends",
+        "container__2021_community_sticker_capsule"
+      ]
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 475,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  },
+  "agent": {
+    "item_name": {
+      "missing_count": 0,
+      "total": 64,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "rarity": {
+      "missing_count": 0,
+      "total": 64,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "sample_price": {
+      "missing_count": 55,
+      "total": 64,
+      "missing_ratio": 0.8594,
+      "examples": [
+        "agent__1st_lieutenant_farlow_swat",
+        "agent__3rd_commando_company_ksk",
+        "agent__arno_the_overgrown_guerrilla_warfare",
+        "agent__aspirant_gendarmerie_nationale",
+        "agent__b_squadron_officer_sas"
+      ]
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 64,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  },
+  "charm": {
+    "item_name": {
+      "missing_count": 0,
+      "total": 82,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "sample_price": {
+      "missing_count": 78,
+      "total": 82,
+      "missing_ratio": 0.9512,
+      "examples": [
+        "charm__charm_8_ball_igl",
+        "charm__charm_baby_karat_ct",
+        "charm__charm_baby_karat_t",
+        "charm__charm_babys_ak",
+        "charm__charm_backsplash"
+      ]
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 82,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  },
+  "other": {
+    "item_name": {
+      "missing_count": 0,
+      "total": 1,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "sample_price": {
+      "missing_count": 0,
+      "total": 1,
+      "missing_ratio": 0.0,
+      "examples": []
+    },
+    "market_hash_name": {
+      "missing_count": 0,
+      "total": 1,
+      "missing_ratio": 0.0,
+      "examples": []
+    }
+  }
+}
