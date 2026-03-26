@@ -6,7 +6,9 @@ from collections.abc import Mapping
 from extraction.auth_cookies import resolve_platform_cookie_header
 from extraction.connectors.base import ProbeFirstConnector
 from extraction.connectors.json_parser import JsonShapeSpec, build_json_point_parser
-from extraction.models import ExtractionTarget
+from extraction.connectors.steam_line1 import parse_steam_line1_points
+from extraction.errors import UnknownResponseShapeError
+from extraction.models import ExtractionTarget, PricePoint, ProbeSample
 from extraction.protocols import AsyncHttpClient
 
 
@@ -21,31 +23,52 @@ class SteamConnector(ProbeFirstConnector):
         http_client: AsyncHttpClient,
         endpoint: str | None = None,
     ) -> None:
+        json_parser = build_json_point_parser(
+            source_name=self.source_name,
+            shapes=(
+                JsonShapeSpec(
+                    points_path=("prices",),
+                    timestamp_field="timestamp",
+                    price_field="price",
+                    volume_field="volume",
+                    currency_field="currency",
+                    timestamp_unit="auto",
+                ),
+                JsonShapeSpec(
+                    points_path=("history",),
+                    timestamp_field="timestamp",
+                    price_field="price",
+                    volume_field="volume",
+                    currency_field="currency",
+                    timestamp_unit="auto",
+                ),
+            ),
+            default_currency="USD",
+        )
+
+        def parse_with_fallback(
+            sample: ProbeSample,
+            target: ExtractionTarget,
+        ) -> tuple[PricePoint, ...]:
+            probe_sample = sample
+            try:
+                return json_parser(probe_sample, target)
+            except UnknownResponseShapeError:
+                pass
+
+            try:
+                return parse_steam_line1_points(sample=probe_sample, target=target)
+            except ValueError as exc:
+                raise UnknownResponseShapeError(
+                    source_name=self.source_name,
+                    sample=probe_sample,
+                    detail=f"unsupported steam payload ({exc})",
+                ) from exc
+
         super().__init__(
             http_client=http_client,
             endpoint=endpoint or os.getenv("STEAM_PROBE_ENDPOINT"),
-            parser=build_json_point_parser(
-                source_name=self.source_name,
-                shapes=(
-                    JsonShapeSpec(
-                        points_path=("prices",),
-                        timestamp_field="timestamp",
-                        price_field="price",
-                        volume_field="volume",
-                        currency_field="currency",
-                        timestamp_unit="auto",
-                    ),
-                    JsonShapeSpec(
-                        points_path=("history",),
-                        timestamp_field="timestamp",
-                        price_field="price",
-                        volume_field="volume",
-                        currency_field="currency",
-                        timestamp_unit="auto",
-                    ),
-                ),
-                default_currency="USD",
-            ),
+            parser=parse_with_fallback,
         )
 
     def build_query_params(self, target: ExtractionTarget) -> Mapping[str, str]:

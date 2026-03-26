@@ -9,6 +9,7 @@ from pathlib import Path
 from pytest import MonkeyPatch
 
 from extraction.connectors.csfloat import CSFloatConnector
+from extraction.connectors.steam import SteamConnector
 from extraction.errors import EndpointNotConfiguredError, UnknownResponseShapeError
 from extraction.models import ExtractionTarget
 from extraction.protocols import HttpResponse
@@ -237,5 +238,75 @@ def test_csfloat_connector_loads_cookie_header_from_auth_cookie_file(
         _, _, headers = client.calls[0]
         assert headers is not None
         assert headers["Cookie"] == "session=from-file"
+
+    asyncio.run(scenario())
+
+
+def test_csfloat_connector_parses_created_at_listings_shape() -> None:
+    async def scenario() -> None:
+        payload = {
+            "data": [
+                {
+                    "created_at": "2026-03-26T10:47:08.000Z",
+                    "price": 123.45,
+                }
+            ]
+        }
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://api.csfloat.test/listings",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+
+        connector = CSFloatConnector(
+            http_client=client,
+            endpoint="https://api.csfloat.test/listings",
+        )
+        target = ExtractionTarget(item_id="15", market_hash_name="AK-47 | Vulcan")
+
+        extraction = await connector.extract(target)
+
+        assert len(extraction.points) == 1
+        assert extraction.points[0].price == 123.45
+
+    asyncio.run(scenario())
+
+
+def test_steam_connector_parses_inline_line1_fallback() -> None:
+    async def scenario() -> None:
+        html_payload = """
+        <html><body>
+        <script>
+        var line1=[["Mar 25 2026 00: +0",10.5,"3"],["Mar 25 2026 01: +0",11.0,"4"]];
+        </script>
+        </body></html>
+        """
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://steamcommunity.com/market/listings/730/item",
+                    status_code=200,
+                    headers={"content-type": "text/html"},
+                    body=html_payload.encode("utf-8"),
+                )
+            ]
+        )
+        connector = SteamConnector(
+            http_client=client,
+            endpoint="https://steamcommunity.com/market/listings/730/item",
+        )
+        target = ExtractionTarget(item_id="21", market_hash_name="AK-47 | Redline")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "steam"
+        assert len(extraction.points) == 2
+        assert extraction.points[0].price == 10.5
+        assert extraction.points[0].volume == 3
 
     asyncio.run(scenario())
