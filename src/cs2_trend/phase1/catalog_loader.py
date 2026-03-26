@@ -86,7 +86,9 @@ def load_targets_from_catalog(
             break
 
     if not targets:
-        raise ValueError(f"No valid extraction targets found in catalog: {catalog_path}")
+        raise ValueError(
+            f"No valid extraction targets found in catalog: {catalog_path}"
+        )
 
     return tuple(targets)
 

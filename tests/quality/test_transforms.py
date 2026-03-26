@@ -84,7 +84,9 @@ def test_extraction_results_to_history_frame_returns_empty_schema_when_no_succes
     assert list(frame.columns) == list(HISTORY_ALL_FIELDS)
 
 
-def test_extraction_results_to_history_frame_includes_context_columns_when_requested() -> None:
+def test_extraction_results_to_history_frame_includes_context_columns_when_requested() -> (
+    None
+):
     target = ExtractionTarget(
         item_id="item-2",
         market_hash_name="AWP | Neo-Noir",

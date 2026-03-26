@@ -9,7 +9,12 @@ from pathlib import Path
 
 from cs2_trend.core.config import AppConfig
 from cs2_trend.phase1.services import execute_phase1_extraction_iterative
-from extraction.models import ConnectorExtraction, ExtractionTarget, PricePoint, ProbeSample
+from extraction.models import (
+    ConnectorExtraction,
+    ExtractionTarget,
+    PricePoint,
+    ProbeSample,
+)
 
 
 @dataclass(slots=True)

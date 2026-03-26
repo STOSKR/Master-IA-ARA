@@ -152,7 +152,9 @@ def test_execute_phase1_extraction_writes_raw_curated_and_metrics(
         assert metrics_payload["sources"]["steam"]["success_count"] == 1
         assert metrics_payload["sources"]["steam"]["failure_count"] == 0
 
-        first_raw_json = json.loads(result.raw_json_paths[0].read_text(encoding="utf-8"))
+        first_raw_json = json.loads(
+            result.raw_json_paths[0].read_text(encoding="utf-8")
+        )
         assert isinstance(first_raw_json, list)
         assert first_raw_json
         assert first_raw_json[0]["object_type"] == "weapon"
@@ -209,7 +211,9 @@ def test_execute_phase1_extraction_iterative_writes_quality_report(
         assert result.quality_report_path is not None
         assert result.quality_report_path.exists()
 
-        report_payload = json.loads(result.quality_report_path.read_text(encoding="utf-8"))
+        report_payload = json.loads(
+            result.quality_report_path.read_text(encoding="utf-8")
+        )
         assert report_payload["criteria"]["min_raw_rows"] == 10
         assert report_payload["final_passed"] is False
         assert len(report_payload["iterations"]) == 2

@@ -12,7 +12,11 @@ from cs2_trend.phase0.discovery import (
 )
 from cs2_trend.phase0.http_clients import UrllibJsonHttpClient
 from cs2_trend.phase0.repositories import FileCatalogRepository, FileProbeDumpRepository
-from cs2_trend.phase0.services import CatalogService, CsfloatCatalogParser, CsfloatProbeService
+from cs2_trend.phase0.services import (
+    CatalogService,
+    CsfloatCatalogParser,
+    CsfloatProbeService,
+)
 
 __all__ = [
     "CatalogService",

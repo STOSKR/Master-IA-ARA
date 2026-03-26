@@ -120,7 +120,10 @@ class CsfloatCatalogParser(CatalogParser):
         by_canonical_id: dict[str, CanonicalItem] = {}
 
         for listing in listings:
+            item_section = self._extract_item_section(listing)
             market_name = self._get_first_string(listing, self._NAME_KEYS)
+            if market_name is None and item_section is not None:
+                market_name = self._get_first_string(item_section, self._NAME_KEYS)
             if market_name is None:
                 continue
 
@@ -135,6 +138,8 @@ class CsfloatCatalogParser(CatalogParser):
 
             source_keys: dict[MarketSource, str] = {}
             source_key = self._get_first_string(listing, self._ID_KEYS)
+            if source_key is None and item_section is not None:
+                source_key = self._get_first_string(item_section, self._ID_KEYS)
             if source_key is not None:
                 source_keys["csfloat"] = source_key
 
@@ -162,6 +167,15 @@ class CsfloatCatalogParser(CatalogParser):
         return tuple(
             sorted(by_canonical_id.values(), key=lambda item: item.canonical_item_id)
         )
+
+    def _extract_item_section(
+        self,
+        listing: dict[str, JsonValue],
+    ) -> dict[str, JsonValue] | None:
+        item = listing.get("item")
+        if isinstance(item, dict):
+            return item
+        return None
 
     def _extract_listings(self, payload: JsonValue) -> tuple[dict[str, JsonValue], ...]:
         if isinstance(payload, list):

@@ -12,7 +12,10 @@ from cs2_price_trend.quality import validate_history_dataframe
 from cs2_price_trend.quality.transforms import extraction_results_to_history_frame
 from cs2_price_trend.storage.paths import StorageRoots
 from cs2_trend.core.config import AppConfig
-from cs2_trend.phase1.catalog_loader import load_targets_from_catalog, resolve_catalog_path
+from cs2_trend.phase1.catalog_loader import (
+    load_targets_from_catalog,
+    resolve_catalog_path,
+)
 from cs2_trend.phase1.connector_setup import (
     build_default_connectors,
     ensure_sources_are_configured,

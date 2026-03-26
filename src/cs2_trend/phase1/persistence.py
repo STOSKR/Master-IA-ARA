@@ -46,7 +46,9 @@ def write_frame_by_source_csv(
     if frame.empty:
         return tuple()
 
-    file_name = "historical_prices_curated.csv" if curated else "historical_prices_raw.csv"
+    file_name = (
+        "historical_prices_curated.csv" if curated else "historical_prices_raw.csv"
+    )
     date_partition = timestamp.date()
     partition_resolver = curated_run_partition_dir if curated else raw_run_partition_dir
 
@@ -93,7 +95,9 @@ def write_frame_json_shards(
         working["object_type"] = "unknown"
 
     written_paths: list[Path] = []
-    for (source, object_type), group in working.groupby(["source", "object_type"], sort=True):
+    for (source, object_type), group in working.groupby(
+        ["source", "object_type"], sort=True
+    ):
         normalized_source = normalize_source(str(source))
         category_slug = sanitize_component(str(object_type))
         root_dir = partition_resolver(
@@ -111,7 +115,9 @@ def write_frame_json_shards(
             kind="stable",
         ).reset_index(drop=True)
 
-        for part_index, start in enumerate(range(0, len(ordered), max_rows_per_file), start=1):
+        for part_index, start in enumerate(
+            range(0, len(ordered), max_rows_per_file), start=1
+        ):
             chunk = ordered.iloc[start : start + max_rows_per_file]
             payload = _to_json_records(chunk)
             output_path = shard_dir / f"{file_prefix}_part_{part_index:04d}.json"
@@ -197,7 +203,9 @@ def _normalize_json_value(value: Any) -> Any:
     if isinstance(value, datetime):
         return value.astimezone(UTC).isoformat()
     if isinstance(value, pd.Timestamp):
-        return value.tz_convert("UTC").isoformat() if value.tzinfo else value.isoformat()
+        return (
+            value.tz_convert("UTC").isoformat() if value.tzinfo else value.isoformat()
+        )
     if pd.isna(value):
         return None
     if hasattr(value, "item"):

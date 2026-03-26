@@ -29,6 +29,12 @@ class CSFloatConnector(ProbeFirstConnector):
                 shapes=(
                     JsonShapeSpec(
                         points_path=("data",),
+                        timestamp_field="created_at",
+                        price_field="price",
+                        timestamp_unit="iso",
+                    ),
+                    JsonShapeSpec(
+                        points_path=("data",),
                         timestamp_field="timestamp",
                         price_field="price",
                         volume_field="volume",

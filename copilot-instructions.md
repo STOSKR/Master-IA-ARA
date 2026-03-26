@@ -170,6 +170,18 @@ Use these entry points:
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 
+## Commit Iteration Hygiene
+
+Before and after each atomic commit iteration, enforce this checklist:
+
+1. Run `git status --short` and classify changes into:
+	- scope of current iteration
+	- pre-existing unrelated changes
+2. Stage only files in current scope (`git add <paths...>`), never blanket add when unrelated edits exist.
+3. After commit, run `git status --short` again and log what remains pending and why.
+4. If pending files are intended follow-up work, commit them in the next explicit iteration; if not, call out that they are intentionally untouched.
+5. When user asks for "everything committed", confirm no pending tracked changes remain before finishing.
+
 <!-- GSD:workflow-end -->
 
 <!-- GSD:profile-start -->

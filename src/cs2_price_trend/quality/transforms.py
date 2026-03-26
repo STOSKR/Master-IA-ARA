@@ -53,7 +53,10 @@ def extraction_results_to_history_frame(
     ordered_columns = list(HISTORY_ALL_FIELDS)
     if include_context_columns:
         for context_column in ("object_type", "object_subtype", "type_name"):
-            if context_column in frame.columns and context_column not in ordered_columns:
+            if (
+                context_column in frame.columns
+                and context_column not in ordered_columns
+            ):
                 ordered_columns.append(context_column)
 
     frame = frame.reindex(columns=ordered_columns)

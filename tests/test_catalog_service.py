@@ -59,3 +59,25 @@ def test_catalog_service_parses_and_persists_tabular_outputs(tmp_path: Path) -> 
 
     assert rows[0]["canonical_item_id"] == records[0].canonical_item_id
     assert "source_keys" in rows[0]
+
+
+def test_catalog_parser_supports_nested_item_payload_shape() -> None:
+    parser = CsfloatCatalogParser()
+
+    records = parser.parse_catalog_items(
+        payload={
+            "data": [
+                {
+                    "id": "list-1",
+                    "item": {
+                        "asset_id": "asset-9",
+                        "market_hash_name": "★ StatTrak™ Bayonet | Blue Steel (Factory New)",
+                    },
+                }
+            ]
+        }
+    )
+
+    assert len(records) == 1
+    assert records[0].canonical_item_id == "stattrak_bayonet__blue_steel__factory_new"
+    assert records[0].source_keys.get("csfloat") == "list-1"
