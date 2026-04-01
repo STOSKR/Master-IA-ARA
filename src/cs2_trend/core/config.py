@@ -18,10 +18,12 @@ class AppConfig(BaseSettings):
     dump_dir: Path = Field(default=Path("data/dumps"))
     probe_dump_dir: Path = Field(default=Path("data/dumps/probes"))
     catalog_dir: Path = Field(default=Path("data/catalog"))
-    steam_probe_endpoint: str | None = None
-    steamdt_probe_endpoint: str | None = None
-    buff163_probe_endpoint: str | None = None
-    csmoney_probe_endpoint: str | None = None
+    steam_probe_endpoint: str | None = (
+        "https://steamcommunity.com/market/listings/730/{market_hash_name}"
+    )
+    steamdt_probe_endpoint: str | None = "https://api.steamdt.com/index/item-block/v1/summary"
+    buff163_probe_endpoint: str | None = "https://buff.163.com/api/market/goods/sell_order"
+    csmoney_probe_endpoint: str | None = "https://cs.money/"
     csfloat_probe_endpoint: str = "https://csfloat.com/api/v1/listings"
     csfloat_history_endpoint: str | None = None
     phase1_max_concurrency: int = 20

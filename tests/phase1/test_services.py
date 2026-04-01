@@ -300,3 +300,75 @@ def test_execute_phase1_extraction_requires_csfloat_auth(
             raise AssertionError("Expected ValueError when CSFloat auth is missing")
 
     asyncio.run(scenario())
+
+
+def test_execute_phase1_extraction_accepts_csfloat_cookie_file_auth(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    async def scenario() -> None:
+        monkeypatch.delenv("CSFLOAT_API_KEY", raising=False)
+        monkeypatch.delenv("CSFLOAT_COOKIE", raising=False)
+
+        cookie_path = tmp_path / "cookies.json"
+        cookie_path.write_text(
+            json.dumps(
+                {
+                    "platforms": {
+                        "csfloat": {
+                            "cookies": [
+                                {
+                                    "name": "session",
+                                    "value": "from-file",
+                                    "domain": "csfloat.com",
+                                    "path": "/",
+                                }
+                            ]
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("AUTH_COOKIES_PATH", str(cookie_path))
+
+        catalog_path = tmp_path / "catalog" / "master_catalog.json"
+        catalog_path.parent.mkdir(parents=True, exist_ok=True)
+        catalog_path.write_text(
+            json.dumps(
+                [
+                    {
+                        "canonical_item_id": "ak_47__redline__field_tested",
+                        "market_hash_name": "AK-47 | Redline (Field-Tested)",
+                        "object_type": "weapon",
+                    }
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        config = AppConfig(
+            data_dir=tmp_path / "data",
+            raw_dir=tmp_path / "data" / "raw",
+            curated_dir=tmp_path / "data" / "curated",
+            dump_dir=tmp_path / "data" / "dumps",
+            probe_dump_dir=tmp_path / "data" / "dumps" / "probes",
+            catalog_dir=tmp_path / "catalog",
+            csfloat_history_endpoint="https://example.test/csfloat/history",
+        )
+
+        def connector_factory(**_kwargs: object) -> tuple[FakeSteamConnector, ...]:
+            return (FakeSteamConnector(source_name="csfloat"),)
+
+        result = await execute_phase1_extraction(
+            config=config,
+            selected_sources=["csfloat"],
+            limit_items=1,
+            catalog_path=catalog_path,
+            connector_factory=connector_factory,
+        )
+
+        assert result.success_count == 1
+        assert result.failure_count == 0
+
+    asyncio.run(scenario())

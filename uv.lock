@@ -82,6 +82,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "typer" },
+    { name = "typing-inspection" },
 ]
 
 [package.optional-dependencies]
@@ -102,6 +103,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3,<9" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6,<1" },
     { name = "typer", specifier = ">=0.12,<1" },
+    { name = "typing-inspection", specifier = ">=0.4,<1" },
 ]
 provides-extras = ["dev"]
 

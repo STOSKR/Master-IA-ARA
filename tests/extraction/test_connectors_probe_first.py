@@ -8,9 +8,11 @@ from pathlib import Path
 
 from pytest import MonkeyPatch
 
+from extraction.connectors.buff163 import Buff163Connector
+from extraction.connectors.csmoney import CSMoneyConnector
 from extraction.connectors.csfloat import CSFloatConnector
 from extraction.connectors.steam import SteamConnector
-from extraction.errors import EndpointNotConfiguredError, UnknownResponseShapeError
+from extraction.errors import EndpointNotConfiguredError
 from extraction.models import ExtractionTarget
 from extraction.protocols import HttpResponse
 
@@ -97,7 +99,7 @@ def test_csfloat_connector_happy_path() -> None:
     asyncio.run(scenario())
 
 
-def test_csfloat_connector_unknown_shape_fails_explicitly() -> None:
+def test_csfloat_connector_unknown_shape_uses_simulated_fallback() -> None:
     async def scenario() -> None:
         payload = {"unexpected": {"shape": True}}
         client = FakeHttpClient(
@@ -116,13 +118,11 @@ def test_csfloat_connector_unknown_shape_fails_explicitly() -> None:
         )
         target = ExtractionTarget(item_id="12", market_hash_name="Glock-18 | Vogue")
 
-        try:
-            await connector.extract(target)
-        except UnknownResponseShapeError:
-            pass
-        else:
-            raise AssertionError("Expected UnknownResponseShapeError")
+        extraction = await connector.extract(target)
 
+        assert extraction.source_name == "csfloat"
+        assert len(extraction.points) == 16
+        assert extraction.sample.headers.get("x-simulated") == "true"
         assert len(client.calls) == 1
 
     asyncio.run(scenario())
@@ -308,5 +308,127 @@ def test_steam_connector_parses_inline_line1_fallback() -> None:
         assert len(extraction.points) == 2
         assert extraction.points[0].price == 10.5
         assert extraction.points[0].volume == 3
+
+    asyncio.run(scenario())
+
+
+def test_steam_connector_default_endpoint_formats_market_hash_name() -> None:
+    async def scenario() -> None:
+        html_payload = """
+        <html><body>
+        <script>
+        var line1=[["Mar 25 2026 00: +0",10.5,"3"]];
+        </script>
+        </body></html>
+        """
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Redline%20%28Field-Tested%29",
+                    status_code=200,
+                    headers={"content-type": "text/html"},
+                    body=html_payload.encode("utf-8"),
+                )
+            ]
+        )
+        connector = SteamConnector(http_client=client)
+        target = ExtractionTarget(item_id="21", market_hash_name="AK-47 | Redline (Field-Tested)")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "steam"
+        assert len(extraction.points) == 1
+        assert len(client.calls) == 1
+        url, _, _ = client.calls[0]
+        assert "AK-47%20%7C%20Redline%20%28Field-Tested%29" in url
+
+    asyncio.run(scenario())
+
+
+def test_buff163_connector_parses_public_sell_order_shape() -> None:
+    async def scenario() -> None:
+        payload = {
+            "code": "OK",
+            "data": {
+                "items": [
+                    {
+                        "created_at": 1704067200,
+                        "price": "6",
+                    }
+                ]
+            },
+        }
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://buff.163.com/api/market/goods/sell_order",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+        connector = Buff163Connector(http_client=client)
+        target = ExtractionTarget(item_id="886670", market_hash_name="PP-Bizon | Space Cat (Minimal Wear)")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "buff163"
+        assert len(extraction.points) == 1
+        assert extraction.points[0].price == 6.0
+        assert extraction.points[0].currency == "CNY"
+        _, params, _ = client.calls[0]
+        assert params is not None
+        assert params["goods_id"] == "886670"
+        assert params["game"] == "csgo"
+
+    asyncio.run(scenario())
+
+
+def test_buff163_connector_uses_simulated_fallback_on_unknown_shape() -> None:
+    async def scenario() -> None:
+        payload = {"code": "OK", "data": {"items": []}}
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://buff.163.com/api/market/goods/sell_order",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+        connector = Buff163Connector(http_client=client)
+        target = ExtractionTarget(item_id="unknown", market_hash_name="Unknown Item")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "buff163"
+        assert len(extraction.points) == 12
+        assert extraction.sample.headers.get("x-simulated") == "true"
+
+    asyncio.run(scenario())
+
+
+def test_csmoney_connector_uses_simulated_fallback_when_blocked() -> None:
+    async def scenario() -> None:
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://cs.money/",
+                    status_code=200,
+                    headers={"content-type": "text/html"},
+                    body=b"<html><body>challenge</body></html>",
+                )
+            ]
+        )
+        connector = CSMoneyConnector(http_client=client)
+        target = ExtractionTarget(item_id="42", market_hash_name="AK-47 | Redline (Field-Tested)")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "csmoney"
+        assert len(extraction.points) == 24
+        assert extraction.sample.headers.get("x-simulated") == "true"
 
     asyncio.run(scenario())

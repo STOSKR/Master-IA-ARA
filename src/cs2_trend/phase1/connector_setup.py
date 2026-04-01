@@ -5,6 +5,7 @@ from collections.abc import Sequence
 
 from cs2_price_trend.quality import normalize_source
 from cs2_trend.core.config import AppConfig
+from extraction.auth_cookies import build_cookie_header_for_platform
 from extraction.connectors import (
     Buff163Connector,
     CSFloatConnector,
@@ -105,6 +106,11 @@ def _has_csfloat_auth() -> bool:
         value = os.getenv(env_name)
         if value and value.strip():
             return True
+
+    cookie_header = build_cookie_header_for_platform(platform="csfloat")
+    if cookie_header and cookie_header.strip():
+        return True
+
     return False
 
 
