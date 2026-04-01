@@ -1,0 +1,31 @@
+{
+  "run_id": "d992ac0f42ce4f679b26ab8126611a93",
+  "started_at_utc": "2026-04-01T20:50:54.736653+00:00",
+  "finished_at_utc": "2026-04-01T20:51:31.498078+00:00",
+  "duration_seconds": 36.761425,
+  "total_jobs": 5,
+  "success_count": 5,
+  "failure_count": 0,
+  "sources": {
+    "steam": {
+      "success_count": 1,
+      "failure_count": 0
+    },
+    "steamdt": {
+      "success_count": 1,
+      "failure_count": 0
+    },
+    "buff163": {
+      "success_count": 1,
+      "failure_count": 0
+    },
+    "csmoney": {
+      "success_count": 1,
+      "failure_count": 0
+    },
+    "csfloat": {
+      "success_count": 1,
+      "failure_count": 0
+    }
+  }
+}
