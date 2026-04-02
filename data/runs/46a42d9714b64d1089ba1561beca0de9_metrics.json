@@ -1,0 +1,15 @@
+{
+  "run_id": "46a42d9714b64d1089ba1561beca0de9",
+  "started_at_utc": "2026-04-02T06:18:06.739047+00:00",
+  "finished_at_utc": "2026-04-02T06:18:07.649932+00:00",
+  "duration_seconds": 0.910885,
+  "total_jobs": 1,
+  "success_count": 1,
+  "failure_count": 0,
+  "sources": {
+    "steam": {
+      "success_count": 1,
+      "failure_count": 0
+    }
+  }
+}
