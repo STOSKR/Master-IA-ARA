@@ -28,6 +28,13 @@ Una vez validado y guardado el catálogo maestro de forma local, debes instancia
 - [x] Step 2 fix applied: CSFloat authentication support added via CSFLOAT_API_KEY or CSFLOAT_COOKIE in Phase 0/Phase 1 paths.
 - [ ] Live extraction success against protected CSFloat endpoint remains pending until valid authentication credentials are configured.
 
+## Maintenance Update 2026-04-02
+
+- [x] Steam connector now prioritizes `/market/pricehistory` for full historical series, with listing fallback only when required.
+- [x] Browser session validation helper added: `node scripts/open_logged_browser.js --platform steam`.
+- [x] Phase 2 final run executed with 5 sources x 5 items (run_id `8479a1df1e614fd1992dc2730199901e`, 25/25 successful jobs).
+- [x] JSON shard schema compacted to hierarchical shape (`source -> category -> items -> series`) to reduce redundant rows.
+
 ## Next Development Steps
 
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.

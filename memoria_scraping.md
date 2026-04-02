@@ -122,3 +122,20 @@ Formato de entrada:
 	- `setup_auth.js` ahora imprime comando directo de validacion visual post-captura.
 - Evidencia (archivos/commits): `scripts/open_logged_browser.js`, `setup_auth.js`.
 - Riesgos pendientes: Cookies invalidas/expiradas seguiran mostrando estado no autenticado y requeriran recaptura.
+
+### 2026-04-02T06:35:00Z - JSON compacto por item para reducir lineas repetidas
+- Problema: El shard JSON tabular repetia campos (`source`, `canonical_item_id`, `object_type`) en cada fila temporal, generando archivos largos.
+- Investigacion en navegador (agent-browser): No aplica; mejora de contrato de persistencia local.
+- Solucion tecnica aplicada:
+	- Se agrega `item_name` en filas raw/curated.
+	- Los shards JSON pasan a formato jerarquico por `source -> category -> items -> series`.
+	- Se mantiene particionado por `max_json_rows`, ahora entendido como maximo de puntos por archivo.
+- Evidencia (archivos/commits): `src/cs2_trend/phase2/bot.py`, `scripts/phase2_multidomain_bot.py`, `tests/phase2/test_bot.py`.
+- Riesgos pendientes: Consumidores antiguos que esperen lista tabular JSON deben adaptarse al nuevo esquema.
+
+### 2026-04-02T06:40:00Z - Corrida final multidominio multi-item con nuevo esquema
+- Problema: Se necesitaba evidencia final con mas de un source y mas de un item, y JSON compacto aplicado.
+- Investigacion en navegador (agent-browser): Reuso de endpoints ya validados en entradas previas.
+- Solucion tecnica aplicada: Ejecucion `PYTHONPATH=src python3 scripts/phase2_multidomain_bot.py --limit-items 5 --delay-seconds 0.5 --max-json-rows 50000 --source steam --source steamdt --source buff163 --source csmoney --source csfloat`.
+- Evidencia (archivos/commits): run_id `8479a1df1e614fd1992dc2730199901e`, metricas en `data/runs/8479a1df1e614fd1992dc2730199901e_metrics.json`, salidas raw/curated de 5 fuentes en `data/raw/date=2026-04-02/` y `data/curated/date=2026-04-02/`.
+- Riesgos pendientes: Buff163/CSFloat/CS.Money pueden usar fallback simulado en escenarios de bloqueo o shape no compatible.

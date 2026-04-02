@@ -282,6 +282,7 @@ def _build_raw_rows(results: Sequence[ExtractionRunResult]) -> list[dict[str, ob
                     "timestamp_utc": point.timestamp.astimezone(UTC).isoformat(),
                     "source": result.source_name,
                     "canonical_item_id": canonical_item_id,
+                    "item_name": result.target.market_hash_name,
                     "price": float(point.price),
                     "currency": point.currency.strip().upper(),
                     "price_basis": "listing",
@@ -465,13 +466,117 @@ def _write_rows_json_shards(
                 str(row.get("canonical_item_id")),
             ),
         )
-        for shard_index, start in enumerate(range(0, len(ordered), max_rows_per_file), start=1):
-            chunk = ordered[start : start + max_rows_per_file]
+
+        compact_items = _build_compact_items(rows=ordered)
+        shards = _split_items_by_point_limit(
+            items=compact_items,
+            max_points_per_file=max_rows_per_file,
+        )
+        for shard_index, shard_items in enumerate(shards, start=1):
+            point_count = sum(
+                len(series)
+                for series in (
+                    item.get("series") for item in shard_items
+                )
+                if isinstance(series, list)
+            )
+            payload = {
+                "source": source,
+                "category": object_type,
+                "run_id": run_id,
+                "kind": "curated" if curated else "raw",
+                "part": shard_index,
+                "item_count": len(shard_items),
+                "point_count": point_count,
+                "items": shard_items,
+            }
             output_path = shard_dir / f"{file_prefix}_part_{shard_index:04d}.json"
-            output_path.write_text(json.dumps(chunk, indent=2, ensure_ascii=True), encoding="utf-8")
+            output_path.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=True),
+                encoding="utf-8",
+            )
             output_paths.append(output_path)
 
     return tuple(output_paths)
+
+
+def _build_compact_items(
+    *,
+    rows: Sequence[dict[str, object | None]],
+) -> list[dict[str, object]]:
+    items_by_id: dict[str, dict[str, object]] = {}
+    for row in rows:
+        canonical_item_id = _as_optional_str(row.get("canonical_item_id"))
+        timestamp = _as_optional_str(row.get("timestamp_utc"))
+        price = row.get("price")
+        if canonical_item_id is None or timestamp is None or not isinstance(price, (int, float)):
+            continue
+
+        item = items_by_id.get(canonical_item_id)
+        if item is None:
+            item_name = _as_optional_str(row.get("item_name")) or canonical_item_id
+            object_type = _as_optional_str(row.get("object_type")) or "unknown"
+            currency = _as_optional_str(row.get("currency")) or "USD"
+            item = {
+                "type": object_type,
+                "name": item_name,
+                "canonical_item_id": canonical_item_id,
+                "currency": currency,
+                "series": [],
+            }
+            items_by_id[canonical_item_id] = item
+
+        series = item["series"]
+        if isinstance(series, list):
+            volume = row.get("volume")
+            series.append(
+                {
+                    "timestamp": timestamp,
+                    "price": float(price),
+                    "volume": float(volume) if isinstance(volume, (int, float)) else None,
+                }
+            )
+
+    compact_items = list(items_by_id.values())
+    for item in compact_items:
+        series = item.get("series")
+        if isinstance(series, list):
+            series.sort(key=lambda point: str(point.get("timestamp")))
+
+    compact_items.sort(
+        key=lambda item: (
+            str(item.get("type")),
+            str(item.get("name")),
+        )
+    )
+    return compact_items
+
+
+def _split_items_by_point_limit(
+    *,
+    items: Sequence[dict[str, object]],
+    max_points_per_file: int,
+) -> list[list[dict[str, object]]]:
+    shards: list[list[dict[str, object]]] = []
+    current: list[dict[str, object]] = []
+    current_points = 0
+
+    for item in items:
+        series = item.get("series")
+        point_count = len(series) if isinstance(series, list) else 0
+
+        if current and current_points + point_count > max_points_per_file:
+            shards.append(current)
+            current = []
+            current_points = 0
+
+        current.append(item)
+        current_points += point_count
+
+    if current:
+        shards.append(current)
+
+    return shards
 
 
 def _write_metrics(
