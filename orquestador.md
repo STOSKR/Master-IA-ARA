@@ -35,6 +35,13 @@ Una vez validado y guardado el catálogo maestro de forma local, debes instancia
 - [x] Phase 2 final run executed with 5 sources x 5 items (run_id `8479a1df1e614fd1992dc2730199901e`, 25/25 successful jobs).
 - [x] JSON shard schema compacted to hierarchical shape (`source -> category -> items -> series`) to reduce redundant rows.
 
+## Maintenance Update 2026-04-02 (Scope Simplification)
+
+- [x] Source scope narrowed to Steam, SteamDT, Buff163 by default (`phase1 extract` and standalone bot defaults).
+- [x] Historical outputs and metrics from non-target sources removed from `data/raw`, `data/curated`, and `data/runs`.
+- [x] Full catalog run completed for SteamDT (`run_id=a454d6e856e3493c94a23e3605e977fd`, 25841/25841 successful jobs).
+- [ ] Full catalog run for Steam remains constrained by platform throttling (HTTP 429 under sustained load) and requires extended throttled execution windows.
+
 ## Next Development Steps
 
 1. Configure CSFLOAT_API_KEY or CSFLOAT_COOKIE in runtime environment.

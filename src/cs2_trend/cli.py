@@ -443,7 +443,7 @@ def phase1_extract(
 
     config, _ = _get_state(ctx)
     selected_sources = (
-        source if source else ["steam", "steamdt", "buff163", "csmoney", "csfloat"]
+        source if source else ["steam", "steamdt", "buff163"]
     )
 
     try:

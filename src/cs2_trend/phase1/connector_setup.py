@@ -30,7 +30,7 @@ def normalize_sources(selected_sources: Sequence[str]) -> tuple[str, ...]:
     """Normalize and deduplicate selected source names."""
 
     if not selected_sources:
-        selected_sources = ("steam", "steamdt", "buff163", "csmoney", "csfloat")
+        selected_sources = ("steam", "steamdt", "buff163")
 
     normalized = tuple(normalize_source(source) for source in selected_sources)
     return tuple(dict.fromkeys(normalized))

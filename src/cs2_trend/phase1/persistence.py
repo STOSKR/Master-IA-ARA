@@ -200,11 +200,17 @@ def _to_json_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
 
 
 def _normalize_json_value(value: Any) -> Any:
-    if isinstance(value, datetime):
-        return value.astimezone(UTC).isoformat()
     if isinstance(value, pd.Timestamp):
         return (
-            value.tz_convert("UTC").isoformat() if value.tzinfo else value.isoformat()
+            value.tz_convert("UTC").isoformat()
+            if value.tzinfo
+            else value.tz_localize("UTC").isoformat()
+        )
+    if isinstance(value, datetime):
+        return (
+            value.astimezone(UTC).isoformat()
+            if value.tzinfo is not None
+            else value.replace(tzinfo=UTC).isoformat()
         )
     if pd.isna(value):
         return None

@@ -37,8 +37,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--limit-items",
         type=int,
-        default=20,
-        help="Maximum number of catalog items to process.",
+        default=0,
+        help="Maximum number of catalog items to process. Use 0 for all catalog items.",
     )
     parser.add_argument(
         "--catalog-file",
@@ -60,6 +60,24 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         default=2000,
         help="Maximum rows per JSON shard file.",
+    )
+    parser.add_argument(
+        "--progress-every",
+        type=int,
+        default=100,
+        help="Print per-source progress every N processed targets.",
+    )
+    parser.add_argument(
+        "--max-attempts",
+        type=int,
+        default=4,
+        help="Maximum extraction attempts per item before marking failure.",
+    )
+    parser.add_argument(
+        "--retry-base-seconds",
+        type=float,
+        default=1.0,
+        help="Base backoff delay in seconds for retries.",
     )
     return parser
 
@@ -142,7 +160,7 @@ async def _run(args: argparse.Namespace) -> None:
     runtime = RuntimeConfig()
     _ensure_dirs(runtime)
 
-    selected_sources = args.sources or ["steam", "steamdt", "buff163", "csmoney", "csfloat"]
+    selected_sources = args.sources or ["steam", "steamdt", "buff163"]
     selected_sources = _normalize_sources(selected_sources)
 
     targets = _load_targets(args.catalog_file, args.limit_items)
@@ -156,6 +174,9 @@ async def _run(args: argparse.Namespace) -> None:
             connectors=connectors,
             targets=targets,
             delay_seconds=args.delay_seconds,
+            progress_every=args.progress_every,
+            max_attempts=args.max_attempts,
+            retry_base_seconds=args.retry_base_seconds,
         )
     finally:
         await client.aclose()
@@ -204,16 +225,18 @@ async def _run(args: argparse.Namespace) -> None:
         f"run_id={run_id} jobs={len(results)} "
         f"success={success_count} failure={failure_count} "
         f"raw_rows={len(raw_rows)}"
+        ,
+        flush=True,
     )
-    print(f"- metrics: {metrics_path}")
+    print(f"- metrics: {metrics_path}", flush=True)
     for path in raw_paths:
-        print(f"- raw: {path}")
+        print(f"- raw: {path}", flush=True)
     for path in raw_json_paths:
-        print(f"- raw_json: {path}")
+        print(f"- raw_json: {path}", flush=True)
     for path in curated_paths:
-        print(f"- curated: {path}")
+        print(f"- curated: {path}", flush=True)
     for path in curated_json_paths:
-        print(f"- curated_json: {path}")
+        print(f"- curated_json: {path}", flush=True)
 
 
 def _ensure_dirs(runtime: RuntimeConfig) -> None:
@@ -276,7 +299,7 @@ def _load_targets(catalog_file: Path, limit_items: int) -> list[ExtractionTarget
                 context=context,
             )
         )
-        if len(targets) >= limit_items:
+        if limit_items > 0 and len(targets) >= limit_items:
             break
 
     if not targets:
@@ -300,6 +323,9 @@ async def _run_sources_parallel(
     connectors: Sequence[object],
     targets: Sequence[ExtractionTarget],
     delay_seconds: float,
+    progress_every: int,
+    max_attempts: int,
+    retry_base_seconds: float,
 ) -> list[dict[str, object]]:
     tasks = [
         asyncio.create_task(
@@ -307,6 +333,9 @@ async def _run_sources_parallel(
                 connector=connector,
                 targets=targets,
                 delay_seconds=delay_seconds,
+                progress_every=progress_every,
+                max_attempts=max_attempts,
+                retry_base_seconds=retry_base_seconds,
             )
         )
         for connector in connectors
@@ -320,14 +349,31 @@ async def _run_source_sequential(
     connector: object,
     targets: Sequence[ExtractionTarget],
     delay_seconds: float,
+    progress_every: int,
+    max_attempts: int,
+    retry_base_seconds: float,
 ) -> list[dict[str, object]]:
     source_results: list[dict[str, object]] = []
     source_name = str(getattr(connector, "source_name", "unknown"))
+    success_count = 0
+    failure_count = 0
+
+    print(
+        f"[source={source_name}] start targets={len(targets)} delay={delay_seconds} "
+        f"max_attempts={max_attempts}",
+        flush=True,
+    )
 
     for index, target in enumerate(targets):
         started_at = datetime.now(tz=UTC)
         try:
-            extraction = await connector.extract(target)  # type: ignore[attr-defined]
+            extraction, attempts_used = await _extract_with_retries(
+                connector=connector,
+                target=target,
+                max_attempts=max_attempts,
+                retry_base_seconds=retry_base_seconds,
+                source_name=source_name,
+            )
             source_results.append(
                 {
                     "source": source_name,
@@ -338,9 +384,16 @@ async def _run_source_sequential(
                     "extraction": extraction,
                     "error_type": None,
                     "error_message": None,
+                    "attempts": attempts_used,
                 }
             )
+            success_count += 1
         except Exception as exc:  # noqa: BLE001
+            print(
+                f"[source={source_name}] failure item={target.item_id} "
+                f"name={target.market_hash_name} error={type(exc).__name__}: {exc}",
+                flush=True,
+            )
             source_results.append(
                 {
                     "source": source_name,
@@ -351,13 +404,64 @@ async def _run_source_sequential(
                     "extraction": None,
                     "error_type": type(exc).__name__,
                     "error_message": str(exc),
+                    "attempts": max_attempts,
                 }
+            )
+            failure_count += 1
+
+        processed = index + 1
+        if progress_every > 0 and (processed % progress_every == 0 or processed == len(targets)):
+            print(
+                f"[source={source_name}] progress {processed}/{len(targets)} "
+                f"success={success_count} failure={failure_count}",
+                flush=True,
             )
 
         if delay_seconds > 0 and index < len(targets) - 1:
             await asyncio.sleep(delay_seconds)
 
+    print(
+        f"[source={source_name}] finished success={success_count} failure={failure_count}",
+        flush=True,
+    )
+
     return source_results
+
+
+async def _extract_with_retries(
+    *,
+    connector: object,
+    target: ExtractionTarget,
+    max_attempts: int,
+    retry_base_seconds: float,
+    source_name: str,
+) -> tuple[object, int]:
+    attempts = max(1, max_attempts)
+    base_delay = max(0.0, retry_base_seconds)
+
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            extraction = await connector.extract(target)  # type: ignore[attr-defined]
+            return extraction, attempt
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            if attempt >= attempts:
+                break
+
+            delay = base_delay * (2 ** (attempt - 1))
+            if delay > 0:
+                print(
+                    f"[source={source_name}] retry item={target.item_id} "
+                    f"attempt={attempt + 1}/{attempts} delay={delay:.2f}s "
+                    f"reason={type(exc).__name__}",
+                    flush=True,
+                )
+                await asyncio.sleep(delay)
+
+    if last_error is None:
+        raise RuntimeError("retry loop finished without result")
+    raise last_error
 
 
 def _build_rows(results: Sequence[dict[str, object]]) -> list[dict[str, object | None]]:

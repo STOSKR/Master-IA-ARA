@@ -139,3 +139,27 @@ Formato de entrada:
 - Solucion tecnica aplicada: Ejecucion `PYTHONPATH=src python3 scripts/phase2_multidomain_bot.py --limit-items 5 --delay-seconds 0.5 --max-json-rows 50000 --source steam --source steamdt --source buff163 --source csmoney --source csfloat`.
 - Evidencia (archivos/commits): run_id `8479a1df1e614fd1992dc2730199901e`, metricas en `data/runs/8479a1df1e614fd1992dc2730199901e_metrics.json`, salidas raw/curated de 5 fuentes en `data/raw/date=2026-04-02/` y `data/curated/date=2026-04-02/`.
 - Riesgos pendientes: Buff163/CSFloat/CS.Money pueden usar fallback simulado en escenarios de bloqueo o shape no compatible.
+
+### 2026-04-02T09:00:00Z - Simplificacion de alcance a Steam/SteamDT/Buff163
+- Problema: Se solicito eliminar fuentes no objetivo y concentrar scraping en Steam + SteamDT (manteniendo Buff163 en alcance).
+- Investigacion en navegador (agent-browser): Validacion de bloqueo intermitente en Steam con respuestas 429 al incrementar ritmo.
+- Solucion tecnica aplicada:
+	- Se limpia `data/raw`, `data/curated` y `data/runs` para eliminar historicos de CSFloat/CS.Money y corridas previas.
+	- Defaults de Phase 1 ajustados a `steam`, `steamdt`, `buff163`.
+	- Runner standalone reforzado con progreso y reintentos exponenciales.
+- Evidencia (archivos/commits): `src/cs2_trend/phase1/connector_setup.py`, `src/cs2_trend/cli.py`, `scripts/phase2_multidomain_bot.py`.
+- Riesgos pendientes: Steam puede entrar en throttling (429) bajo carga sostenida.
+
+### 2026-04-02T09:20:00Z - Scraping full catalog completado para SteamDT
+- Problema: Se necesitaba completar catalogo exhaustivo con una fuente prioritaria estable.
+- Investigacion en navegador (agent-browser): Endpoint SteamDT `index/item-block/v1/summary` estable y consistente en full run.
+- Solucion tecnica aplicada: `CS2TREND_LOG_LEVEL=WARNING PYTHONPATH=src .venv_clean/bin/python -m cs2_trend phase1 extract --source steamdt --catalog-file data/catalog/master_catalog_exhaustive.json --limit-items 25841 --max-iterations 1 --min-success-rate 0 --min-raw-rows 0 --max-json-rows 50000`.
+- Evidencia (archivos/commits): run_id `a454d6e856e3493c94a23e3605e977fd`, `jobs=25841 success=25841 failure=0`, metricas y outputs en `data/runs/a454d6e856e3493c94a23e3605e977fd_metrics.json`, `data/raw/year=2026/month=04/day=02/source=steamdt/run_id=a454d6e856e3493c94a23e3605e977fd/`, `data/curated/year=2026/month=04/day=02/source=steamdt/run_id=a454d6e856e3493c94a23e3605e977fd/`.
+- Riesgos pendientes: El endpoint usado es de bloque resumen, no historico profundo por item.
+
+### 2026-04-02T09:30:00Z - Correccion de serializacion de timestamps en Phase 1
+- Problema: Full runs de Phase 1 podian fallar al serializar `pd.Timestamp` naive (`TypeError: Cannot convert tz-naive Timestamp`).
+- Investigacion en navegador (agent-browser): No aplica; fallo reproducido en ejecucion CLI con catalogo completo.
+- Solucion tecnica aplicada: normalizacion robusta en `_normalize_json_value` para `pd.Timestamp` y `datetime` naive -> UTC.
+- Evidencia (archivos/commits): `src/cs2_trend/phase1/persistence.py`.
+- Riesgos pendientes: Ninguno para este caso concreto de serializacion.
