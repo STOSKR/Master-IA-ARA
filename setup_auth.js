@@ -153,6 +153,9 @@ async function run() {
     console.log(
       "Use AUTH_COOKIES_PATH to relocate the file if you do not want it in the repository root."
     );
+    console.log(
+      "Visual validation command: node scripts/open_logged_browser.js --platform steam"
+    );
   } finally {
     prompt.close();
     await context.close();

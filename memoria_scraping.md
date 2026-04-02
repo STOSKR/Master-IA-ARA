@@ -103,3 +103,22 @@ Formato de entrada:
 - Solucion tecnica aplicada: Ejecucion con `PYTHONPATH=src python3 scripts/phase2_multidomain_bot.py --limit-items 1 --delay-seconds 1 --source steam --source steamdt --source buff163 --source csmoney --source csfloat`.
 - Evidencia (archivos/commits): run_id `d992ac0f42ce4f679b26ab8126611a93`, `data/runs/d992ac0f42ce4f679b26ab8126611a93_metrics.json`, salidas raw/curated por fuente en `data/raw` y `data/curated`.
 - Riesgos pendientes: Aunque el pipeline completa 5/5, parte de los datos puede provenir de fallbacks simulados cuando una fuente real esta bloqueada.
+
+### 2026-04-02T00:00:00Z - Steam historico completo con endpoint pricehistory
+- Problema: La extraccion estaba priorizando HTML/listing y podia devolver serie parcial en lugar de historico completo.
+- Investigacion en navegador (agent-browser): Se confirma que el grafico de Steam usa el endpoint `/market/pricehistory` para el historico completo por item.
+- Solucion tecnica aplicada:
+	- `SteamConnector` cambia a estrategia `pricehistory` por defecto (`appid=730` + `market_hash_name`).
+	- Se agrega parser dedicado para shape real `prices: [[timestamp, price, volume], ...]`.
+	- Se mantiene fallback automatico a listing (`line1`) si `pricehistory` falla por auth/bloqueo/shape.
+- Evidencia (archivos/commits): `src/extraction/connectors/steam.py`, `src/extraction/connectors/steam_pricehistory.py`, `src/cs2_trend/core/config.py`, `tests/extraction/test_connectors_probe_first.py`.
+- Riesgos pendientes: Si la sesion Steam expira, `pricehistory` puede degradar a fallback HTML.
+
+### 2026-04-02T00:10:00Z - Validacion visual de sesion con cookies en browser real
+- Problema: El browser integrado de VS Code no comparte automaticamente la sesion/cookies capturadas del scraper.
+- Investigacion en navegador (agent-browser): Se observa que abrir URL directa no garantiza sesion autenticada en esa vista.
+- Solucion tecnica aplicada:
+	- Nuevo script `scripts/open_logged_browser.js` para abrir Chromium visible con cookies cargadas desde `cookies.json`/`AUTH_COOKIES_PATH`.
+	- `setup_auth.js` ahora imprime comando directo de validacion visual post-captura.
+- Evidencia (archivos/commits): `scripts/open_logged_browser.js`, `setup_auth.js`.
+- Riesgos pendientes: Cookies invalidas/expiradas seguiran mostrando estado no autenticado y requeriran recaptura.
