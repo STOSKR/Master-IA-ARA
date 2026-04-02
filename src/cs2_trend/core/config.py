@@ -18,9 +18,7 @@ class AppConfig(BaseSettings):
     dump_dir: Path = Field(default=Path("data/dumps"))
     probe_dump_dir: Path = Field(default=Path("data/dumps/probes"))
     catalog_dir: Path = Field(default=Path("data/catalog"))
-    steam_probe_endpoint: str | None = (
-        "https://steamcommunity.com/market/listings/730/{market_hash_name}"
-    )
+    steam_probe_endpoint: str | None = "https://steamcommunity.com/market/pricehistory/"
     steamdt_probe_endpoint: str | None = "https://api.steamdt.com/index/item-block/v1/summary"
     buff163_probe_endpoint: str | None = "https://buff.163.com/api/market/goods/sell_order"
     csmoney_probe_endpoint: str | None = "https://cs.money/"

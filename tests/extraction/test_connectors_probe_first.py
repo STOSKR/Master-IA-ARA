@@ -312,22 +312,22 @@ def test_steam_connector_parses_inline_line1_fallback() -> None:
     asyncio.run(scenario())
 
 
-def test_steam_connector_default_endpoint_formats_market_hash_name() -> None:
+def test_steam_connector_default_endpoint_uses_pricehistory() -> None:
     async def scenario() -> None:
-        html_payload = """
-        <html><body>
-        <script>
-        var line1=[["Mar 25 2026 00: +0",10.5,"3"]];
-        </script>
-        </body></html>
-        """
+        payload = {
+            "success": True,
+            "prices": [["Mar 25 2026 00: +0", "$10.50", "3"]],
+        }
         client = FakeHttpClient(
             responses=[
                 HttpResponse(
-                    url="https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Redline%20%28Field-Tested%29",
+                    url=(
+                        "https://steamcommunity.com/market/pricehistory/"
+                        "?appid=730&market_hash_name=AK-47%20%7C%20Redline%20%28Field-Tested%29"
+                    ),
                     status_code=200,
-                    headers={"content-type": "text/html"},
-                    body=html_payload.encode("utf-8"),
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
                 )
             ]
         )
@@ -339,8 +339,115 @@ def test_steam_connector_default_endpoint_formats_market_hash_name() -> None:
         assert extraction.source_name == "steam"
         assert len(extraction.points) == 1
         assert len(client.calls) == 1
-        url, _, _ = client.calls[0]
-        assert "AK-47%20%7C%20Redline%20%28Field-Tested%29" in url
+        url, params, _ = client.calls[0]
+        assert url == "https://steamcommunity.com/market/pricehistory/"
+        assert params is not None
+        assert params["appid"] == "730"
+        assert params["market_hash_name"] == "AK-47 | Redline (Field-Tested)"
+
+    asyncio.run(scenario())
+
+
+def test_steam_connector_falls_back_to_listing_when_pricehistory_payload_is_blocked() -> None:
+    async def scenario() -> None:
+        fallback_html = """
+        <html><body>
+        <script>
+        var line1=[["Mar 25 2026 00: +0",10.5,"3"],["Mar 25 2026 01: +0",10.7,"4"]];
+        </script>
+        </body></html>
+        """
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url=(
+                        "https://steamcommunity.com/market/pricehistory/"
+                        "?appid=730&market_hash_name=AK-47%20%7C%20Redline"
+                    ),
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps({"success": False}).encode("utf-8"),
+                ),
+                HttpResponse(
+                    url="https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Redline",
+                    status_code=200,
+                    headers={"content-type": "text/html"},
+                    body=fallback_html.encode("utf-8"),
+                ),
+            ]
+        )
+        connector = SteamConnector(http_client=client)
+        target = ExtractionTarget(item_id="22", market_hash_name="AK-47 | Redline")
+
+        extraction = await connector.extract(target)
+
+        assert extraction.source_name == "steam"
+        assert len(extraction.points) == 2
+        assert len(client.calls) == 2
+        first_url, first_params, _ = client.calls[0]
+        second_url, second_params, _ = client.calls[1]
+        assert first_url == "https://steamcommunity.com/market/pricehistory/"
+        assert first_params is not None
+        assert first_params["appid"] == "730"
+        assert "market/listings/730/AK-47%20%7C%20Redline" in second_url
+        assert second_params == {}
+
+    asyncio.run(scenario())
+
+
+def test_steam_connector_loads_cookie_header_from_auth_cookie_file(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    async def scenario() -> None:
+        payload = {
+            "success": True,
+            "prices": [["Mar 25 2026 00: +0", "$10.50", "3"]],
+        }
+        client = FakeHttpClient(
+            responses=[
+                HttpResponse(
+                    url="https://steamcommunity.com/market/pricehistory/?appid=730",
+                    status_code=200,
+                    headers={"content-type": "application/json"},
+                    body=json.dumps(payload).encode("utf-8"),
+                )
+            ]
+        )
+
+        cookie_store_path = tmp_path / "cookies.json"
+        cookie_store_payload = {
+            "platforms": {
+                "steam": {
+                    "cookies": [
+                        {
+                            "name": "steamLoginSecure",
+                            "value": "from-file",
+                            "domain": "steamcommunity.com",
+                            "path": "/",
+                        }
+                    ]
+                }
+            }
+        }
+        cookie_store_path.write_text(
+            json.dumps(cookie_store_payload),
+            encoding="utf-8",
+        )
+
+        monkeypatch.setenv("AUTH_COOKIES_PATH", str(cookie_store_path))
+        monkeypatch.delenv("STEAM_COOKIE", raising=False)
+        monkeypatch.delenv("STEAM_USER_AGENT", raising=False)
+
+        connector = SteamConnector(http_client=client)
+        target = ExtractionTarget(item_id="23", market_hash_name="AK-47 | Vulcan")
+
+        await connector.extract(target)
+
+        assert len(client.calls) == 1
+        _, _, headers = client.calls[0]
+        assert headers is not None
+        assert headers["Cookie"] == "steamLoginSecure=from-file"
 
     asyncio.run(scenario())
 
