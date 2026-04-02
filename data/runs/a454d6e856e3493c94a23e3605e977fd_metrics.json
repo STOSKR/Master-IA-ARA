@@ -1,0 +1,13 @@
+{
+  "run_id": "a454d6e856e3493c94a23e3605e977fd",
+  "started_at_utc": "2026-04-02T07:29:27.186664+00:00",
+  "total_success_count": 25841,
+  "total_failure_count": 0,
+  "sources": {
+    "steamdt": {
+      "success_count": 25841,
+      "failure_count": 0
+    }
+  },
+  "total_jobs": 25841
+}

@@ -19,6 +19,16 @@ PYTHONPATH=src python3 scripts/phase2_multidomain_bot.py \
   --source steam --source steamdt --source buff163 --source csmoney --source csfloat
 ```
 
+Current simplified scope:
+
+- `steam`
+- `steamdt`
+- `buff163`
+
+Primary completed full-catalog run in this scope:
+
+- `steamdt` full catalog run_id: `a454d6e856e3493c94a23e3605e977fd`
+
 ## Compact JSON Schema
 
 `historical_prices_*_part_XXXX.json` now uses a compact hierarchical schema:

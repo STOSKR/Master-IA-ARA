@@ -1,6 +1,0 @@
-timestamp_utc,source,canonical_item_id,item_name,price,currency,price_basis,volume,availability,object_type,object_subtype,type_name
-2026-04-02T06:36:46.195402+00:00,steamdt,agent__1st_lieutenant_farlow_swat,1st Lieutenant Farlow | SWAT,14825.52,CNY,listing,,,agent,agent,agent
-2026-04-02T06:36:47.601350+00:00,steamdt,agent__3rd_commando_company_ksk,3rd Commando Company | KSK,14825.52,CNY,listing,,,agent,agent,agent
-2026-04-02T06:36:50.318622+00:00,steamdt,agent__arno_the_overgrown_guerrilla_warfare,Arno The Overgrown | Guerrilla Warfare,14825.52,CNY,listing,,,agent,agent,agent
-2026-04-02T06:36:51.545157+00:00,steamdt,agent__aspirant_gendarmerie_nationale,Aspirant | Gendarmerie Nationale,14825.52,CNY,listing,,,agent,agent,agent
-2026-04-02T06:36:53.001055+00:00,steamdt,agent__b_squadron_officer_sas,B Squadron Officer | SAS,14825.52,CNY,listing,,,agent,agent,agent

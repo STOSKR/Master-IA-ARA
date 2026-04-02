@@ -1,0 +1,15 @@
+[
+  {
+    "timestamp_utc": "2026-04-02T07:24:20.225778+00:00",
+    "source": "steamdt",
+    "canonical_item_id": "other__shadow_daggers",
+    "price": 14782.75,
+    "currency": "CNY",
+    "price_basis": "listing",
+    "volume": null,
+    "availability": null,
+    "object_type": "other",
+    "object_subtype": "Skin",
+    "type_name": "Skin"
+  }
+]

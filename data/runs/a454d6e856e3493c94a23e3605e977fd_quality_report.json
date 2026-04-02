@@ -1,0 +1,23 @@
+{
+  "generated_at_utc": "2026-04-02T07:29:27.296864+00:00",
+  "criteria": {
+    "min_success_rate": 0.0,
+    "min_raw_rows": 0,
+    "require_zero_failures": true
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "run_id": "a454d6e856e3493c94a23e3605e977fd",
+      "timestamp_utc": "2026-04-02T07:29:27.293308+00:00",
+      "success_rate": 1.0,
+      "raw_row_count": 129205,
+      "total_jobs": 25841,
+      "success_count": 25841,
+      "failure_count": 0,
+      "passed": true,
+      "reasons": []
+    }
+  ],
+  "final_passed": true
+}
