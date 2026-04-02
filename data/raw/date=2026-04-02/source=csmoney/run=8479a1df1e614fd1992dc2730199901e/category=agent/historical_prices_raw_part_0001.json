@@ -1,0 +1,651 @@
+{
+  "source": "csmoney",
+  "category": "agent",
+  "run_id": "8479a1df1e614fd1992dc2730199901e",
+  "kind": "raw",
+  "part": 1,
+  "item_count": 5,
+  "point_count": 120,
+  "items": [
+    {
+      "type": "agent",
+      "name": "1st Lieutenant Farlow | SWAT",
+      "canonical_item_id": "agent__1st_lieutenant_farlow_swat",
+      "currency": "USD",
+      "series": [
+        {
+          "timestamp": "2026-04-01T07:00:00+00:00",
+          "price": 22.3,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T08:00:00+00:00",
+          "price": 22.59,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T09:00:00+00:00",
+          "price": 22.45,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T10:00:00+00:00",
+          "price": 22.75,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T11:00:00+00:00",
+          "price": 22.6,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T12:00:00+00:00",
+          "price": 22.45,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T13:00:00+00:00",
+          "price": 22.75,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T14:00:00+00:00",
+          "price": 22.61,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T15:00:00+00:00",
+          "price": 22.46,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T16:00:00+00:00",
+          "price": 22.76,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T17:00:00+00:00",
+          "price": 22.61,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T18:00:00+00:00",
+          "price": 22.46,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 22.76,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 22.62,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 22.91,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 22.77,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 22.62,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 22.91,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 22.77,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 22.62,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 22.92,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 22.78,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 22.63,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 22.92,
+          "volume": 3.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "3rd Commando Company | KSK",
+      "canonical_item_id": "agent__3rd_commando_company_ksk",
+      "currency": "USD",
+      "series": [
+        {
+          "timestamp": "2026-04-01T07:00:00+00:00",
+          "price": 24.36,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T08:00:00+00:00",
+          "price": 24.21,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T09:00:00+00:00",
+          "price": 24.07,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T10:00:00+00:00",
+          "price": 24.37,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T11:00:00+00:00",
+          "price": 24.22,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T12:00:00+00:00",
+          "price": 24.07,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T13:00:00+00:00",
+          "price": 24.37,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T14:00:00+00:00",
+          "price": 24.23,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T15:00:00+00:00",
+          "price": 24.52,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T16:00:00+00:00",
+          "price": 24.38,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T17:00:00+00:00",
+          "price": 24.23,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T18:00:00+00:00",
+          "price": 24.52,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 24.38,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 24.23,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 24.53,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 24.39,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 24.24,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 24.53,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 24.39,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 24.68,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 24.54,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 24.39,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 24.69,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 24.54,
+          "volume": 2.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Arno The Overgrown | Guerrilla Warfare",
+      "canonical_item_id": "agent__arno_the_overgrown_guerrilla_warfare",
+      "currency": "USD",
+      "series": [
+        {
+          "timestamp": "2026-04-01T07:00:00+00:00",
+          "price": 30.24,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T08:00:00+00:00",
+          "price": 30.54,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T09:00:00+00:00",
+          "price": 30.39,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T10:00:00+00:00",
+          "price": 30.25,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T11:00:00+00:00",
+          "price": 30.54,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T12:00:00+00:00",
+          "price": 30.39,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T13:00:00+00:00",
+          "price": 30.69,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T14:00:00+00:00",
+          "price": 30.54,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T15:00:00+00:00",
+          "price": 30.4,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T16:00:00+00:00",
+          "price": 30.7,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T17:00:00+00:00",
+          "price": 30.55,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T18:00:00+00:00",
+          "price": 30.4,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 30.7,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 30.55,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 30.41,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 30.7,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 30.56,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 30.85,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 30.71,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 30.56,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 30.86,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 30.71,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 30.57,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 30.86,
+          "volume": 2.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Aspirant | Gendarmerie Nationale",
+      "canonical_item_id": "agent__aspirant_gendarmerie_nationale",
+      "currency": "USD",
+      "series": [
+        {
+          "timestamp": "2026-04-01T07:00:00+00:00",
+          "price": 30.88,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T08:00:00+00:00",
+          "price": 31.18,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T09:00:00+00:00",
+          "price": 31.03,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T10:00:00+00:00",
+          "price": 30.89,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T11:00:00+00:00",
+          "price": 31.18,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T12:00:00+00:00",
+          "price": 31.04,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T13:00:00+00:00",
+          "price": 30.89,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T14:00:00+00:00",
+          "price": 31.18,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T15:00:00+00:00",
+          "price": 31.04,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T16:00:00+00:00",
+          "price": 31.34,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T17:00:00+00:00",
+          "price": 31.19,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T18:00:00+00:00",
+          "price": 31.04,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 31.34,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 31.2,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 31.05,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 31.35,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 31.2,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 31.05,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 31.35,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 31.21,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 31.5,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 31.36,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 31.21,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 31.5,
+          "volume": 4.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "B Squadron Officer | SAS",
+      "canonical_item_id": "agent__b_squadron_officer_sas",
+      "currency": "USD",
+      "series": [
+        {
+          "timestamp": "2026-04-01T07:00:00+00:00",
+          "price": 29.96,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T08:00:00+00:00",
+          "price": 29.82,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T09:00:00+00:00",
+          "price": 30.11,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T10:00:00+00:00",
+          "price": 29.97,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T11:00:00+00:00",
+          "price": 30.26,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T12:00:00+00:00",
+          "price": 30.11,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T13:00:00+00:00",
+          "price": 29.97,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T14:00:00+00:00",
+          "price": 30.27,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T15:00:00+00:00",
+          "price": 30.12,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T16:00:00+00:00",
+          "price": 29.98,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T17:00:00+00:00",
+          "price": 30.27,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T18:00:00+00:00",
+          "price": 30.12,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 29.98,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 30.27,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 30.13,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 30.43,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 30.28,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 30.13,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 30.43,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 30.29,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 30.14,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 30.44,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 30.29,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 30.14,
+          "volume": 2.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "source": "steamdt",
+  "category": "agent",
+  "run_id": "8479a1df1e614fd1992dc2730199901e",
+  "kind": "curated",
+  "part": 1,
+  "item_count": 5,
+  "point_count": 5,
+  "items": [
+    {
+      "type": "agent",
+      "name": "1st Lieutenant Farlow | SWAT",
+      "canonical_item_id": "agent__1st_lieutenant_farlow_swat",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-02T06:36:46.195402+00:00",
+          "price": 14825.52,
+          "volume": null
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "3rd Commando Company | KSK",
+      "canonical_item_id": "agent__3rd_commando_company_ksk",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-02T06:36:47.601350+00:00",
+          "price": 14825.52,
+          "volume": null
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Arno The Overgrown | Guerrilla Warfare",
+      "canonical_item_id": "agent__arno_the_overgrown_guerrilla_warfare",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-02T06:36:50.318622+00:00",
+          "price": 14825.52,
+          "volume": null
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Aspirant | Gendarmerie Nationale",
+      "canonical_item_id": "agent__aspirant_gendarmerie_nationale",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-02T06:36:51.545157+00:00",
+          "price": 14825.52,
+          "volume": null
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "B Squadron Officer | SAS",
+      "canonical_item_id": "agent__b_squadron_officer_sas",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-02T06:36:53.001055+00:00",
+          "price": 14825.52,
+          "volume": null
+        }
+      ]
+    }
+  ]
+}

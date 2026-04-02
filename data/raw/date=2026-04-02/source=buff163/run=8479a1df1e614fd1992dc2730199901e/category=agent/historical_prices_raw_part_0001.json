@@ -1,0 +1,351 @@
+{
+  "source": "buff163",
+  "category": "agent",
+  "run_id": "8479a1df1e614fd1992dc2730199901e",
+  "kind": "raw",
+  "part": 1,
+  "item_count": 5,
+  "point_count": 60,
+  "items": [
+    {
+      "type": "agent",
+      "name": "1st Lieutenant Farlow | SWAT",
+      "canonical_item_id": "agent__1st_lieutenant_farlow_swat",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 134.9,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 135.5,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 136.1,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 135.14,
+          "volume": 9.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 135.74,
+          "volume": 10.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 134.78,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 135.38,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 135.98,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 135.02,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 135.62,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 136.22,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 135.26,
+          "volume": 7.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "3rd Commando Company | KSK",
+      "canonical_item_id": "agent__3rd_commando_company_ksk",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 111.72,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 112.32,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 112.92,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 111.96,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 112.56,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 111.6,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 112.2,
+          "volume": 9.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 112.8,
+          "volume": 10.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 111.84,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 112.44,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 111.48,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 112.08,
+          "volume": 4.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Arno The Overgrown | Guerrilla Warfare",
+      "canonical_item_id": "agent__arno_the_overgrown_guerrilla_warfare",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 122.8,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 123.4,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 124.0,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 123.04,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 123.64,
+          "volume": 9.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 122.68,
+          "volume": 10.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 123.28,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 123.88,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 122.92,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 123.52,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 124.12,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 123.16,
+          "volume": 6.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "Aspirant | Gendarmerie Nationale",
+      "canonical_item_id": "agent__aspirant_gendarmerie_nationale",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 73.4,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 74.0,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 74.6,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 73.64,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 74.24,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 73.28,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 73.88,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 74.48,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 73.52,
+          "volume": 9.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 74.12,
+          "volume": 10.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 74.72,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 73.76,
+          "volume": 2.0
+        }
+      ]
+    },
+    {
+      "type": "agent",
+      "name": "B Squadron Officer | SAS",
+      "canonical_item_id": "agent__b_squadron_officer_sas",
+      "currency": "CNY",
+      "series": [
+        {
+          "timestamp": "2026-04-01T19:00:00+00:00",
+          "price": 92.88,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-01T20:00:00+00:00",
+          "price": 93.48,
+          "volume": 2.0
+        },
+        {
+          "timestamp": "2026-04-01T21:00:00+00:00",
+          "price": 92.52,
+          "volume": 3.0
+        },
+        {
+          "timestamp": "2026-04-01T22:00:00+00:00",
+          "price": 93.12,
+          "volume": 4.0
+        },
+        {
+          "timestamp": "2026-04-01T23:00:00+00:00",
+          "price": 93.72,
+          "volume": 5.0
+        },
+        {
+          "timestamp": "2026-04-02T00:00:00+00:00",
+          "price": 92.76,
+          "volume": 6.0
+        },
+        {
+          "timestamp": "2026-04-02T01:00:00+00:00",
+          "price": 93.36,
+          "volume": 7.0
+        },
+        {
+          "timestamp": "2026-04-02T02:00:00+00:00",
+          "price": 92.4,
+          "volume": 8.0
+        },
+        {
+          "timestamp": "2026-04-02T03:00:00+00:00",
+          "price": 93.0,
+          "volume": 9.0
+        },
+        {
+          "timestamp": "2026-04-02T04:00:00+00:00",
+          "price": 93.6,
+          "volume": 10.0
+        },
+        {
+          "timestamp": "2026-04-02T05:00:00+00:00",
+          "price": 92.64,
+          "volume": 1.0
+        },
+        {
+          "timestamp": "2026-04-02T06:00:00+00:00",
+          "price": 93.24,
+          "volume": 2.0
+        }
+      ]
+    }
+  ]
+}
